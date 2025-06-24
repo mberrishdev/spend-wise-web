@@ -196,7 +196,7 @@ const Landing: React.FC = () => (
         <div className="flex-grow h-px bg-gradient-to-l from-transparent via-blue-200 to-transparent" />
       </div>
       <div className="max-w-4xl w-full flex justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full md:w-auto justify-items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:w-auto justify-items-center">
           {testimonials.map((t, i) => (
             <div
               key={i}
