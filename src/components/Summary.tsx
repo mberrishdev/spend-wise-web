@@ -85,7 +85,6 @@ export const Summary = () => {
       return expense.category === category.name;
     });
 
-    console.log("test", expenses, currentPeriodExpenses, categoryExpenses);
     const actual = categoryExpenses.reduce(
       (sum, expense) => sum + expense.amount,
       0

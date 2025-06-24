@@ -13,34 +13,18 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Outlet, NavLink, useLocation } from "react-router-dom";
 
-const Index = () => {
-  const [activeTab, setActiveTab] = useState("daily");
-  const [showNewPeriodPrompt, setShowNewPeriodPrompt] = useState(false);
+const tabs = [
+  { id: "budget", label: "Budget", icon: Calendar, path: "/dashboard/budget" },
+  { id: "log", label: "Log", icon: PlusCircle, path: "/dashboard/log" },
+  { id: "summary", label: "Summary", icon: BarChart3, path: "/dashboard/summary" },
+  { id: "settings", label: "Settings", icon: SettingsIcon, path: "/dashboard/settings" },
+];
+
+const DashboardLayout = () => {
   const { signOut, user } = useAuth();
-
-  const tabs = [
-    { id: "planner", label: "Budget", icon: Calendar },
-    { id: "daily", label: "Log", icon: PlusCircle },
-    { id: "summary", label: "Summary", icon: BarChart3 },
-    { id: "settings", label: "Settings", icon: SettingsIcon },
-  ];
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case "planner":
-        return <BudgetPlanner />;
-      case "daily":
-        return <DailyLog />;
-      case "summary":
-        return <Summary />;
-      case "settings":
-        return <Settings />;
-      default:
-        return <DailyLog />;
-    }
-  };
-
+  const location = useLocation();
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       {/* Header */}
@@ -85,7 +69,9 @@ const Index = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-md mx-auto px-4 py-6">{renderContent()}</div>
+      <div className="max-w-md mx-auto px-4 py-6">
+        <Outlet />
+      </div>
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-green-100">
@@ -93,20 +79,23 @@ const Index = () => {
           <div className="flex justify-around py-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
+              const isActive = location.pathname === tab.path;
               return (
-                <button
+                <NavLink
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? "bg-green-100 text-green-700"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
+                  to={tab.path}
+                  className={({ isActive }) =>
+                    `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? "bg-green-100 text-green-700"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`
+                  }
+                  end
                 >
                   <Icon size={20} />
                   <span className="text-xs mt-1 font-medium">{tab.label}</span>
-                </button>
+                </NavLink>
               );
             })}
           </div>
@@ -115,13 +104,8 @@ const Index = () => {
 
       {/* Bottom padding to account for fixed navigation */}
       <div className="h-20"></div>
-
-      {/* New Period Prompt */}
-      {showNewPeriodPrompt && (
-        <NewPeriodPrompt onClose={() => setShowNewPeriodPrompt(false)} />
-      )}
     </div>
   );
 };
 
-export default Index;
+export default DashboardLayout;
