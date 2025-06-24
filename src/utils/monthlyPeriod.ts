@@ -1,5 +1,5 @@
-import { db } from '@/integrations/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from "@/integrations/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export interface MonthlyPeriod {
   startDay: number;
@@ -7,7 +7,7 @@ export interface MonthlyPeriod {
 }
 
 export async function getMonthlyPeriod(uid: string): Promise<MonthlyPeriod> {
-  const ref = doc(db, 'users', uid, 'monthlyPlan', 'main');
+  const ref = doc(db, "users", uid, "monthlyPlan", "main");
   const snap = await getDoc(ref);
   if (snap.exists()) {
     return snap.data() as MonthlyPeriod;
@@ -16,12 +16,17 @@ export async function getMonthlyPeriod(uid: string): Promise<MonthlyPeriod> {
   return { startDay: 25, endDay: 24 };
 }
 
-export async function setMonthlyPeriod(uid: string, period: MonthlyPeriod): Promise<void> {
-  const ref = doc(db, 'users', uid, 'monthlyPlan', 'main');
+export async function setMonthlyPeriod(
+  uid: string,
+  period: MonthlyPeriod
+): Promise<void> {
+  const ref = doc(db, "users", uid, "monthlyPlan", "main");
   await setDoc(ref, period, { merge: true });
 }
 
-export const getCurrentPeriodRange = (period: MonthlyPeriod): { start: Date; end: Date } => {
+export const getCurrentPeriodRange = (
+  period: MonthlyPeriod
+): { start: Date; end: Date } => {
   const { startDay, endDay } = period;
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -33,25 +38,34 @@ export const getCurrentPeriodRange = (period: MonthlyPeriod): { start: Date; end
 
   if (currentDay >= startDay) {
     // We're in the current period
-    periodStart = new Date(currentYear, currentMonth, startDay);
-    periodEnd = new Date(currentYear, currentMonth + 1, endDay);
+    periodStart = new Date(currentYear, currentMonth, startDay, 0, 0, 0, 0);
+    periodEnd = new Date(currentYear, currentMonth + 1, endDay, 23, 59, 59, 999);
   } else {
     // We're still in the previous period
-    periodStart = new Date(currentYear, currentMonth - 1, startDay);
-    periodEnd = new Date(currentYear, currentMonth, endDay);
+    periodStart = new Date(currentYear, currentMonth - 1, startDay, 0, 0, 0, 0);
+    periodEnd = new Date(currentYear, currentMonth, endDay, 23, 59, 59, 999);
   }
 
   return { start: periodStart, end: periodEnd };
 };
 
-export const isDateInCurrentPeriod = (date: Date, period: MonthlyPeriod): boolean => {
+export const isDateInCurrentPeriod = (
+  date: Date,
+  period: MonthlyPeriod
+): boolean => {
   const { start, end } = getCurrentPeriodRange(period);
   return date >= start && date <= end;
 };
 
 export const formatPeriodRange = (period: MonthlyPeriod): string => {
   const { start, end } = getCurrentPeriodRange(period);
-  const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const startStr = start.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+  const endStr = end.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
   return `${startStr} - ${endStr}`;
 };
