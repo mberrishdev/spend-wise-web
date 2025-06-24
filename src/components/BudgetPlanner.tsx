@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2, Pencil, X, Check } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getCategories, addCategory, updateCategory, deleteCategory } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,6 +23,9 @@ export const BudgetPlanner = () => {
   const [newCategoryAmount, setNewCategoryAmount] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editAmount, setEditAmount] = useState("");
 
   useEffect(() => {
     if (!uid) return;
@@ -121,6 +124,13 @@ export const BudgetPlanner = () => {
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Empty state message */}
+          {categories.length === 0 && (
+            <div className="flex flex-col items-center justify-center gap-2 py-6">
+              <span className="text-3xl">🗂️</span>
+              <div className="text-gray-600 text-base text-center">No categories yet. <br />Create your first budget category below!</div>
+            </div>
+          )}
           {/* Add new category */}
           <div className="bg-green-50 p-4 rounded-lg space-y-3">
             <h3 className="font-medium text-gray-700">Add New Category</h3>
@@ -146,32 +156,97 @@ export const BudgetPlanner = () => {
 
           {/* Categories list */}
           <div className="space-y-3">
-            {categories.map((category) => (
-              <div key={category.id} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
-                <Input
-                  value={category.name}
-                  onChange={(e) => handleUpdateCategory(category.id, "name", e.target.value)}
-                  className="flex-1 font-medium"
-                />
-                <div className="flex items-center gap-1">
-                  <span className="text-sm text-gray-500">{currency}</span>
-                  <Input
-                    type="number"
-                    value={category.plannedAmount}
-                    onChange={(e) => handleUpdateCategory(category.id, "plannedAmount", parseFloat(e.target.value) || 0)}
-                    className="w-20 text-right"
-                  />
+            {categories.map((category) => {
+              const isEditing = editId === category.id;
+              return (
+                <div key={category.id} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
+                  {isEditing ? (
+                    <>
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="flex-1 font-medium"
+                      />
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-500">{currency}</span>
+                        <Input
+                          type="number"
+                          value={editAmount}
+                          onChange={(e) => setEditAmount(e.target.value)}
+                          className="w-20 text-right"
+                        />
+                      </div>
+                      <Button
+                        onClick={async () => {
+                          if (!editName.trim() || !editAmount || parseFloat(editAmount) <= 0) {
+                            toast({ title: "Please enter a valid name and amount", variant: "destructive" });
+                            return;
+                          }
+                          await handleUpdateCategory(category.id, "name", editName.trim());
+                          await handleUpdateCategory(category.id, "plannedAmount", parseFloat(editAmount));
+                          setEditId(null);
+                        }}
+                        size="sm"
+                        className="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100"
+                        title="Save"
+                      >
+                        <Check size={16} />
+                      </Button>
+                      <Button
+                        onClick={() => setEditId(null)}
+                        size="sm"
+                        variant="ghost"
+                        className="text-gray-400 hover:text-red-500"
+                        title="Cancel"
+                      >
+                        <X size={16} />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Input
+                        value={category.name}
+                        readOnly
+                        className="flex-1 font-medium bg-transparent border-none focus:ring-0 focus:outline-none cursor-default"
+                        tabIndex={-1}
+                      />
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-500">{currency}</span>
+                        <Input
+                          type="number"
+                          value={category.plannedAmount}
+                          readOnly
+                          className="w-20 text-right bg-transparent border-none focus:ring-0 focus:outline-none cursor-default"
+                          tabIndex={-1}
+                        />
+                      </div>
+                      <Button
+                        onClick={() => {
+                          setEditId(category.id);
+                          setEditName(category.name);
+                          setEditAmount(category.plannedAmount.toString());
+                        }}
+                        size="sm"
+                        variant="ghost"
+                        className="text-blue-500 hover:text-blue-700"
+                        title="Edit"
+                      >
+                        <Pencil size={16} />
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteCategory(category.id)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        title="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </>
+                  )}
                 </div>
-                <Button
-                  onClick={() => handleDeleteCategory(category.id)}
-                  variant="ghost"
-                  size="sm"
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 size={16} />
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Total */}
