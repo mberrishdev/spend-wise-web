@@ -7,12 +7,24 @@ import { toast } from "@/hooks/use-toast";
 import { archiveCurrentPeriod, getExpenses } from "@/utils/periodManager";
 import { getMonthlyPeriod, setMonthlyPeriod, MonthlyPeriod } from "@/utils/monthlyPeriod";
 import { useAuth } from "@/hooks/useAuth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "@/integrations/firebase";
+
+const CURRENCIES = [
+  { code: "GEL", symbol: "₾" },
+  { code: "USD", symbol: "$" },
+  { code: "EUR", symbol: "€" },
+  { code: "GBP", symbol: "£" },
+  { code: "JPY", symbol: "¥" },
+  { code: "INR", symbol: "₹" },
+];
 
 export const Settings = () => {
   const { user } = useAuth();
   const uid = user?.uid;
   const [startDay, setStartDay] = useState(25);
   const [endDay, setEndDay] = useState(24);
+  const [currency, setCurrency] = useState("₾");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,14 +32,20 @@ export const Settings = () => {
     if (!uid) return;
     setLoading(true);
     setError(null);
-    getMonthlyPeriod(uid)
-      .then((period) => {
+    Promise.all([
+      getMonthlyPeriod(uid),
+      getDoc(doc(db, "users", uid, "profile", "main")),
+    ])
+      .then(([period, profileSnap]) => {
         setStartDay(period.startDay);
         setEndDay(period.endDay);
+        if (profileSnap.exists()) {
+          setCurrency(profileSnap.data().currency || "₾");
+        }
         setLoading(false);
       })
       .catch(() => {
-        setError("Failed to load period settings");
+        setError("Failed to load settings");
         setLoading(false);
       });
   }, [uid]);
@@ -51,6 +69,18 @@ export const Settings = () => {
       });
     } catch {
       toast({ title: "Failed to save period", variant: "destructive" });
+    }
+  };
+
+  const saveCurrency = async (newCurrency: string) => {
+    if (!uid) return;
+    setCurrency(newCurrency);
+    try {
+      await setDoc(doc(db, "users", uid, "profile", "main"), { currency: newCurrency }, { merge: true });
+      const currencyObj = CURRENCIES.find(c => c.symbol === newCurrency);
+      toast({ title: `Currency set to ${currencyObj?.code || newCurrency} (${newCurrency})` });
+    } catch {
+      toast({ title: "Failed to save currency", variant: "destructive" });
     }
   };
 
@@ -117,6 +147,23 @@ export const Settings = () => {
               />
               <p className="text-xs text-gray-600">
                 e.g., 24 = 24th of next month
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="currency">Currency:</Label>
+              <select
+                id="currency"
+                value={currency}
+                onChange={e => saveCurrency(e.target.value)}
+                className="w-full p-2 border rounded"
+              >
+                {CURRENCIES.map(c => (
+                  <option key={c.code} value={c.symbol}>{c.code} ({c.symbol})</option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-600">
+                This currency symbol will be used throughout the app.
               </p>
             </div>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getCategories, addCategory, updateCategory, deleteCategory } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface BudgetCategory {
   id: string;
@@ -23,6 +24,7 @@ const defaultCategories: Omit<BudgetCategory, "id">[] = [
 export const BudgetPlanner = () => {
   const { user } = useAuth();
   const uid = user?.uid;
+  const { currency } = useCurrency();
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryAmount, setNewCategoryAmount] = useState("");
@@ -61,6 +63,13 @@ export const BudgetPlanner = () => {
       });
       return;
     }
+    if (parseFloat(newCategoryAmount) <= 0) {
+      toast({
+        title: "Amount must be greater than 0",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!uid) return;
     try {
       await addCategory(uid, {
@@ -79,6 +88,13 @@ export const BudgetPlanner = () => {
 
   const handleUpdateCategory = async (id: string, field: keyof BudgetCategory, value: string | number) => {
     if (!uid) return;
+    if (field === "plannedAmount" && (typeof value === "number" ? value <= 0 : parseFloat(value) <= 0)) {
+      toast({
+        title: "Amount must be greater than 0",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       await updateCategory(uid, id, { [field]: value });
       const updated = await getCategories(uid);
@@ -133,7 +149,7 @@ export const BudgetPlanner = () => {
               />
               <Input
                 type="number"
-                placeholder="₾"
+                placeholder={currency}
                 value={newCategoryAmount}
                 onChange={(e) => setNewCategoryAmount(e.target.value)}
                 className="w-24"
@@ -154,7 +170,7 @@ export const BudgetPlanner = () => {
                   className="flex-1 font-medium"
                 />
                 <div className="flex items-center gap-1">
-                  <span className="text-sm text-gray-500">₾</span>
+                  <span className="text-sm text-gray-500">{currency}</span>
                   <Input
                     type="number"
                     value={category.plannedAmount}
@@ -178,7 +194,7 @@ export const BudgetPlanner = () => {
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex justify-between items-center">
               <span className="font-medium text-gray-700">Total Monthly Budget:</span>
-              <span className="text-xl font-bold text-green-600">₾{totalPlanned.toFixed(2)}</span>
+              <span className="text-xl font-bold text-green-600">{currency}{totalPlanned.toFixed(2)}</span>
             </div>
           </div>
         </CardContent>

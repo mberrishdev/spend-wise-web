@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { getCurrentPeriodRange, formatPeriodRange, isDateInCurrentPeriod, getMonthlyPeriod, MonthlyPeriod } from "@/utils/monthlyPeriod";
 import { getExpenses, getCategories } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface Expense {
   id: string;
@@ -30,6 +31,7 @@ interface CategorySummary {
 export const Summary = () => {
   const { user } = useAuth();
   const uid = user?.uid;
+  const { currency } = useCurrency();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
   const [period, setPeriod] = useState<MonthlyPeriod | null>(null);
@@ -120,12 +122,12 @@ export const Summary = () => {
         <CardContent>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">₾{totalActual.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-blue-600">{currency}{totalActual.toFixed(2)}</div>
               <div className="text-sm text-gray-600">Spent</div>
             </div>
             <div className="text-center">
               <div className={`text-2xl font-bold ${totalRemaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ₾{Math.abs(totalRemaining).toFixed(2)}
+                {currency}{Math.abs(totalRemaining).toFixed(2)}
               </div>
               <div className="text-sm text-gray-600">
                 {totalRemaining >= 0 ? 'Remaining' : 'Over Budget'}
@@ -165,8 +167,8 @@ export const Summary = () => {
                   <span className="font-medium text-gray-800">{summary.category}</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-medium">₾{summary.actual.toFixed(2)}</div>
-                  <div className="text-sm text-gray-500">of ₾{summary.planned.toFixed(2)}</div>
+                  <div className="font-medium">{currency}{summary.actual.toFixed(2)}</div>
+                  <div className="text-sm text-gray-500">of {currency}{summary.planned.toFixed(2)}</div>
                 </div>
               </div>
               
@@ -178,7 +180,7 @@ export const Summary = () => {
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">{summary.percentage.toFixed(1)}% used</span>
                 <span className={`font-medium ${summary.remaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {summary.remaining >= 0 ? '₾' + summary.remaining.toFixed(2) + ' left' : '₾' + Math.abs(summary.remaining).toFixed(2) + ' over'}
+                  {summary.remaining >= 0 ? currency + summary.remaining.toFixed(2) + ' left' : currency + Math.abs(summary.remaining).toFixed(2) + ' over'}
                 </span>
               </div>
             </CardContent>

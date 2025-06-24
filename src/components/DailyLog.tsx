@@ -8,6 +8,7 @@ import { PlusCircle, Calendar } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getExpenses, addExpense, getCategories } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface Expense {
   id: string;
@@ -26,6 +27,7 @@ interface BudgetCategory {
 export const DailyLog = () => {
   const { user } = useAuth();
   const uid = user?.uid;
+  const { currency } = useCurrency();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -78,7 +80,7 @@ export const DailyLog = () => {
       setNote("");
       toast({
         title: "Expense logged! 💸",
-        description: `₾${amount} spent on ${selectedCategory}`,
+        description: `${currency}${amount} spent on ${selectedCategory}`,
       });
       // Reload from Firestore to get real id
       const updated = await getExpenses(uid);
@@ -138,7 +140,7 @@ export const DailyLog = () => {
           </Select>
 
           <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₾</span>
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{currency}</span>
             <Input
               type="number"
               placeholder="0.00"
@@ -174,7 +176,7 @@ export const DailyLog = () => {
         <CardContent>
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-600">Total spent today:</span>
-            <span className="text-xl font-bold text-blue-600">₾{todaysTotal.toFixed(2)}</span>
+            <span className="text-xl font-bold text-blue-600">{currency}{todaysTotal.toFixed(2)}</span>
           </div>
 
           <div className="space-y-2">
@@ -190,7 +192,7 @@ export const DailyLog = () => {
                     )}
                   </div>
                   <div className="text-right">
-                    <div className="font-medium text-gray-800">₾{expense.amount.toFixed(2)}</div>
+                    <div className="font-medium text-gray-800">{currency}{expense.amount.toFixed(2)}</div>
                   </div>
                 </div>
               ))

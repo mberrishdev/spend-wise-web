@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import React from "react";
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
 
 const queryClient = new QueryClient();
 
@@ -34,24 +35,26 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <BrowserRouter>
-          <React.Suspense fallback={null}>
-            <Routes>
-              <Route path="/login" element={
-                <RedirectIfAuth>
-                  <Login />
-                </RedirectIfAuth>
-              } />
-              <Route path="/" element={
-                <RequireAuth>
-                  <Index />
-                </RequireAuth>
-              } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </React.Suspense>
-        </BrowserRouter>
+        <CurrencyProvider>
+          <BrowserRouter>
+            <React.Suspense fallback={null}>
+              <Routes>
+                <Route path="/login" element={
+                  <RedirectIfAuth>
+                    <Login />
+                  </RedirectIfAuth>
+                } />
+                <Route path="/" element={
+                  <RequireAuth>
+                    <Index />
+                  </RequireAuth>
+                } />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </React.Suspense>
+          </BrowserRouter>
+        </CurrencyProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
