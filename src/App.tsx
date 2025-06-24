@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import React from "react";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +24,7 @@ function RedirectIfAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const location = useLocation();
   if (loading) return null;
-  if (user) return <Navigate to="/" state={{ from: location }} replace />;
+  if (user) return <Navigate to="/dashboard" state={{ from: location }} replace />;
   return <>{children}</>;
 }
 
@@ -39,12 +40,17 @@ const App = () => (
           <BrowserRouter>
             <React.Suspense fallback={null}>
               <Routes>
+                <Route path="/" element={
+                  <RedirectIfAuth>
+                    <Landing />
+                  </RedirectIfAuth>
+                } />
                 <Route path="/login" element={
                   <RedirectIfAuth>
                     <Login />
                   </RedirectIfAuth>
                 } />
-                <Route path="/" element={
+                <Route path="/dashboard" element={
                   <RequireAuth>
                     <Index />
                   </RequireAuth>
