@@ -120,5 +120,11 @@
   "landing": {
     "get_started": "Get Started Free",
     "go_to_dashboard": "Go to Dashboard"
-  }
+  },
+  "greeting_name": "{{greeting}}, {{name}}!",
+  "good_morning": "Good morning",
+  "good_afternoon": "Good afternoon",
+  "good_evening": "Good evening",
+  "good_night": "Good night",
+  "friend": "friend"
 }

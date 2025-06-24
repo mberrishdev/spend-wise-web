@@ -122,5 +122,11 @@
   "landing": {
     "get_started": "დაიწყეთ უფასოდ",
     "go_to_dashboard": "გადადით ფინანსები"
-  }
+  },
+  "greeting_name": "{{greeting}}, {{name}}!",
+  "good_morning": "დილა მშვიდობისა",
+  "good_afternoon": "საღამო მშვიდობისა",
+  "good_evening": "საღამო მშვიდობისა",
+  "good_night": "ღამე მშვიდობისა",
+  "friend": "მეგობარო"
 }

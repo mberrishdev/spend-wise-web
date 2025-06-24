@@ -51,12 +51,23 @@ const DashboardLayout = () => {
             )}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 text-center">
-              💰 SpendWise
-            </h1>
-            <p className="text-sm text-gray-600 text-center mt-1">
-              {t('app.subtitle')}
-            </p>
+            {user && (
+              <div className="text-center mt-1">
+                <span className="text-base font-medium text-gray-700">
+                  {(() => {
+                    const hour = new Date().getHours();
+                    let greetingKey = 'good_morning';
+                    if (hour < 5) greetingKey = 'good_night';
+                    else if (hour < 12) greetingKey = 'good_morning';
+                    else if (hour < 18) greetingKey = 'good_afternoon';
+                    else greetingKey = 'good_evening';
+                    const name = user.displayName?.split(' ')[0] || user.email?.split('@')[0] || t('friend', 'friend');
+                    return t('greeting_name', { greeting: t(greetingKey), name });
+                  })()}
+                </span>
+              </div>
+            )}
+     
           </div>
           <button
             onClick={signOut}
