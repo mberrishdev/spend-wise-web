@@ -51,10 +51,20 @@ export const Settings = () => {
       .then(([period, profileSnap]) => {
         setStartDay(period.startDay);
         setEndDay(period.endDay);
-        initialPeriod.current = { startDay: period.startDay, endDay: period.endDay };
+        initialPeriod.current = {
+          startDay: period.startDay,
+          endDay: period.endDay,
+        };
         if (profileSnap.exists()) {
-          setCurrency(profileSnap.data().currency || "₾");
-          initialCurrency.current = profileSnap.data().currency || "₾";
+          const data = profileSnap.data();
+          setCurrency(data.currency || "₾");
+          initialCurrency.current = data.currency || "₾";
+          if (data.language && data.language !== i18n.language) {
+            i18n.changeLanguage(data.language);
+          }
+          if (data.theme && data.theme !== theme) {
+            setTheme(data.theme);
+          }
         }
         initialLang.current = i18n.language;
         setLoading(false);
@@ -66,7 +76,9 @@ export const Settings = () => {
     // eslint-disable-next-line
   }, [uid]);
 
-  const periodChanged = startDay !== initialPeriod.current.startDay || endDay !== initialPeriod.current.endDay;
+  const periodChanged =
+    startDay !== initialPeriod.current.startDay ||
+    endDay !== initialPeriod.current.endDay;
   const currencyChanged = currency !== initialCurrency.current;
   const langChanged = i18n.language !== initialLang.current;
 
@@ -92,7 +104,10 @@ export const Settings = () => {
         description: t("settings.budget_month_range", { startDay, endDay }),
       });
     } catch {
-      toast({ title: t("settings.failed_to_save_period"), variant: "destructive" });
+      toast({
+        title: t("settings.failed_to_save_period"),
+        variant: "destructive",
+      });
     }
     setSaving(false);
   };
@@ -102,19 +117,41 @@ export const Settings = () => {
     setCurrency(newCurrency);
     setSaving(true);
     try {
-      await setDoc(doc(db, "users", uid, "profile", "main"), { currency: newCurrency }, { merge: true });
+      await setDoc(
+        doc(db, "users", uid, "profile", "main"),
+        { currency: newCurrency },
+        { merge: true }
+      );
       initialCurrency.current = newCurrency;
-      toast({ title: t("settings.currency_set", { code: CURRENCIES.find(c => c.symbol === newCurrency)?.code, symbol: newCurrency }) });
+      toast({
+        title: t("settings.currency_set", {
+          code: CURRENCIES.find((c) => c.symbol === newCurrency)?.code,
+          symbol: newCurrency,
+        }),
+      });
     } catch {
-      toast({ title: t("settings.failed_to_save_currency"), variant: "destructive" });
+      toast({
+        title: t("settings.failed_to_save_currency"),
+        variant: "destructive",
+      });
     }
     setSaving(false);
   };
 
-  const saveLanguage = (lang: string) => {
+  const saveLanguage = async (lang: string) => {
     i18n.changeLanguage(lang);
     initialLang.current = lang;
     toast({ title: t("settings.language_note") });
+    if (uid) {
+      await setDoc(doc(db, "users", uid, "profile", "main"), { language: lang }, { merge: true });
+    }
+  };
+
+  const handleThemeChange = async (newTheme: typeof theme) => {
+    setTheme(newTheme);
+    if (uid) {
+      await setDoc(doc(db, "users", uid, "profile", "main"), { theme: newTheme }, { merge: true });
+    }
   };
 
   const handleStartNewPeriod = async () => {
@@ -160,15 +197,22 @@ export const Settings = () => {
         <CardContent className="space-y-4 px-4 pb-4">
           <div className="bg-purple-50 dark:bg-gray-800 rounded-lg p-4 flex flex-col md:flex-col gap-4">
             <div className="flex-1">
-              <Label htmlFor="start-day" className="text-gray-700 dark:text-gray-100">{t("settings.budget_month_starts")}</Label>
+              <Label
+                htmlFor="start-day"
+                className="text-gray-700 dark:text-gray-100"
+              >
+                {t("settings.budget_month_starts")}
+              </Label>
               <Input
                 id="start-day"
                 type="number"
                 min="1"
                 max="31"
                 value={startDay}
-                onChange={e => setStartDay(parseInt(e.target.value) || 1)}
-                className={`w-full dark:bg-gray-900 dark:text-gray-100 ${periodError ? "border-red-400" : ""}`}
+                onChange={(e) => setStartDay(parseInt(e.target.value) || 1)}
+                className={`w-full dark:bg-gray-900 dark:text-gray-100 ${
+                  periodError ? "border-red-400" : ""
+                }`}
                 aria-invalid={!!periodError}
               />
               {periodError && (
@@ -176,15 +220,22 @@ export const Settings = () => {
               )}
             </div>
             <div className="flex-1">
-              <Label htmlFor="end-day" className="text-gray-700 dark:text-gray-100">{t("settings.budget_month_ends")}</Label>
+              <Label
+                htmlFor="end-day"
+                className="text-gray-700 dark:text-gray-100"
+              >
+                {t("settings.budget_month_ends")}
+              </Label>
               <Input
                 id="end-day"
                 type="number"
                 min="1"
                 max="31"
                 value={endDay}
-                onChange={e => setEndDay(parseInt(e.target.value) || 1)}
-                className={`w-full dark:bg-gray-900 dark:text-gray-100 ${periodError ? "border-red-400" : ""}`}
+                onChange={(e) => setEndDay(parseInt(e.target.value) || 1)}
+                className={`w-full dark:bg-gray-900 dark:text-gray-100 ${
+                  periodError ? "border-red-400" : ""
+                }`}
                 aria-invalid={!!periodError}
               />
             </div>
@@ -193,18 +244,30 @@ export const Settings = () => {
               className="bg-purple-600 hover:bg-purple-700 min-w-[140px] flex items-center justify-center rounded-lg shadow text-white disabled:bg-purple-300 dark:disabled:bg-purple-900"
               disabled={!periodChanged || !!periodError || saving}
             >
-              {saving && periodChanged ? <span className="animate-spin mr-2">⏳</span> : null}
-              {success && !saving ? <span className="text-green-500 mr-2">✔️</span> : null}
+              {saving && periodChanged ? (
+                <span className="animate-spin mr-2">⏳</span>
+              ) : null}
+              {success && !saving ? (
+                <span className="text-green-500 mr-2">✔️</span>
+              ) : null}
               {t("settings.save_period")}
             </Button>
           </div>
-          <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{t("settings.eg_25")} / {t("settings.eg_24")}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+            {t("settings.eg_25")} / {t("settings.eg_24")}
+          </p>
           <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mt-2 flex items-center gap-3">
             <span className="text-xl">ℹ️</span>
             <div>
-              <h4 className="font-medium text-gray-700 dark:text-gray-100 mb-1">{t("settings.current_period")}</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300">{t("settings.period_range", { startDay, endDay })}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t("settings.period_example")}</p>
+              <h4 className="font-medium text-gray-700 dark:text-gray-100 mb-1">
+                {t("settings.current_period")}
+              </h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                {t("settings.period_range", { startDay, endDay })}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {t("settings.period_example")}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -218,11 +281,16 @@ export const Settings = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 px-4 pb-4">
-          <Label htmlFor="currency" className="text-gray-700 dark:text-gray-100">{t("settings.currency")}</Label>
+          <Label
+            htmlFor="currency"
+            className="text-gray-700 dark:text-gray-100"
+          >
+            {t("settings.currency")}
+          </Label>
           <select
             id="currency"
             value={currency}
-            onChange={e => saveCurrency(e.target.value)}
+            onChange={(e) => saveCurrency(e.target.value)}
             className="w-full p-2 border rounded dark:bg-gray-900 dark:text-gray-100"
             disabled={saving}
           >
@@ -232,7 +300,9 @@ export const Settings = () => {
               </option>
             ))}
           </select>
-          <p className="text-xs text-gray-600 dark:text-gray-400">{t("settings.currency_note")}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400">
+            {t("settings.currency_note")}
+          </p>
         </CardContent>
       </Card>
 
@@ -244,18 +314,25 @@ export const Settings = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 px-4 pb-4">
-          <Label htmlFor="language" className="text-gray-700 dark:text-gray-100">{t("settings.language_label")}</Label>
+          <Label
+            htmlFor="language"
+            className="text-gray-700 dark:text-gray-100"
+          >
+            {t("settings.language_label")}
+          </Label>
           <select
             id="language"
             value={i18n.language}
-            onChange={e => saveLanguage(e.target.value)}
+            onChange={(e) => saveLanguage(e.target.value)}
             className="w-full p-2 border rounded dark:bg-gray-900 dark:text-gray-100"
             disabled={saving}
           >
             <option value="en">English</option>
             <option value="ka">ქართული</option>
           </select>
-          <p className="text-xs text-gray-600 dark:text-gray-400">{t("settings.language_note")}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400">
+            {t("settings.language_note")}
+          </p>
         </CardContent>
       </Card>
 
@@ -268,28 +345,45 @@ export const Settings = () => {
         </CardHeader>
         <CardContent className="space-y-2 px-4 pb-4">
           <div className="flex items-center gap-4">
-            <Label htmlFor="theme-switch" className="flex-1 text-gray-700 dark:text-gray-100">{t("settings.theme")}</Label>
+            <Label
+              htmlFor="theme-switch"
+              className="flex-1 text-gray-700 dark:text-gray-100"
+            >
+              {t("settings.theme")}
+            </Label>
             <div className="flex items-center gap-2">
               <button
-                className={`px-2 py-1 rounded ${theme === 'system' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200'}`}
-                onClick={() => setTheme('system')}
+                className={`px-2 py-1 rounded ${
+                  theme === "system"
+                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                    : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                }`}
+                onClick={() => handleThemeChange("system")}
                 type="button"
               >
-                {t('settings.theme_system')}
+                {t("settings.theme_system")}
               </button>
               <button
-                className={`px-2 py-1 rounded ${theme === 'light' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200'}`}
-                onClick={() => setTheme('light')}
+                className={`px-2 py-1 rounded ${
+                  theme === "light"
+                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                    : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                }`}
+                onClick={() => handleThemeChange("light")}
                 type="button"
               >
-                {t('settings.theme_light')}
+                {t("settings.theme_light")}
               </button>
               <button
-                className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200'}`}
-                onClick={() => setTheme('dark')}
+                className={`px-2 py-1 rounded ${
+                  theme === "dark"
+                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                    : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                }`}
+                onClick={() => handleThemeChange("dark")}
                 type="button"
               >
-                {t('settings.theme_dark')}
+                {t("settings.theme_dark")}
               </button>
             </div>
           </div>
@@ -297,7 +391,7 @@ export const Settings = () => {
       </Card>
 
       {/* Actions Section */}
-      {/* <Card className="border-orange-200 shadow-sm bg-white dark:bg-gray-900">
+      <Card className="border-orange-200 shadow-sm bg-white dark:bg-gray-900">
         <CardHeader className="pb-2 px-4 pt-4">
           <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
             🔄 {t("settings.period_management")}
@@ -305,7 +399,9 @@ export const Settings = () => {
         </CardHeader>
         <CardContent className="px-4 pb-4">
           <div className="bg-orange-50 dark:bg-gray-800 p-4 rounded-lg space-y-3">
-            <p className="text-sm text-gray-700 dark:text-gray-100">{t("settings.archive_note")}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-100">
+              {t("settings.archive_note")}
+            </p>
             <Button
               onClick={handleStartNewPeriod}
               variant="outline"
@@ -317,7 +413,7 @@ export const Settings = () => {
             </Button>
           </div>
         </CardContent>
-      </Card> */}
+      </Card>
     </div>
   );
 };
