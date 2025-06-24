@@ -14,6 +14,7 @@ import { Summary } from "@/components/Summary";
 import { Settings } from "@/components/Settings";
 import NotFound from "./pages/NotFound";
 import { Analytics } from "@vercel/analytics/react";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const queryClient = new QueryClient();
 
@@ -40,31 +41,33 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AuthProvider>
-        <CurrencyProvider>
-          <BrowserRouter>
-            <React.Suspense fallback={null}>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/login" element={
-                  <RedirectIfAuth>
-                    <Login />
-                  </RedirectIfAuth>
-                } />
-                <Route path="/dashboard" element={<RequireAuth><DashboardLayout /></RequireAuth>}>
-                  <Route path="budget" element={<BudgetPlanner />} />
-                  <Route path="log" element={<DailyLog />} />
-                  <Route path="summary" element={<Summary />} />
-                  <Route path="settings" element={<Settings />} />
-                  <Route index element={<Navigate to="log" replace />} />
-                </Route>
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </React.Suspense>
-          </BrowserRouter>
-        </CurrencyProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <CurrencyProvider>
+            <BrowserRouter>
+              <React.Suspense fallback={null}>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/login" element={
+                    <RedirectIfAuth>
+                      <Login />
+                    </RedirectIfAuth>
+                  } />
+                  <Route path="/dashboard" element={<RequireAuth><DashboardLayout /></RequireAuth>}>
+                    <Route path="budget" element={<BudgetPlanner />} />
+                    <Route path="log" element={<DailyLog />} />
+                    <Route path="summary" element={<Summary />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route index element={<Navigate to="log" replace />} />
+                  </Route>
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </React.Suspense>
+            </BrowserRouter>
+          </CurrencyProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </TooltipProvider>
     <Analytics />
   </QueryClientProvider>

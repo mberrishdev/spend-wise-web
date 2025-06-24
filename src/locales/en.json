@@ -84,7 +84,11 @@
     "language_label": "Language",
     "language_note": "Choose your preferred language for the app.",
     "period_section_description": "Set the start and end day for your monthly budget period.",
-    "currency": "Currency"
+    "currency": "Currency",
+    "theme": "Theme",
+    "theme_system": "System",
+    "theme_light": "Light",
+    "theme_dark": "Dark"
   },
   "add": "Add",
   "edit": "Edit",

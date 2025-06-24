@@ -123,10 +123,10 @@ export const BudgetPlanner = () => {
     <div className="space-y-6">
       <Card className="border-green-200 shadow-sm">
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
+          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
             📊 {t('budgetPlanner.monthly_budget_plan')}
           </CardTitle>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             {t('budgetPlanner.set_goals')}
           </p>
         </CardHeader>
@@ -135,12 +135,12 @@ export const BudgetPlanner = () => {
           {categories.length === 0 && (
             <div className="flex flex-col items-center justify-center gap-2 py-6">
               <span className="text-3xl">🗂️</span>
-              <div className="text-gray-600 text-base text-center">{t('budgetPlanner.no_categories')}</div>
+              <div className="text-gray-600 dark:text-gray-300 text-base text-center">{t('budgetPlanner.no_categories')}</div>
             </div>
           )}
           {/* Add new category */}
-          <div className="bg-green-50 p-4 rounded-lg space-y-3">
-            <h3 className="font-medium text-gray-700">{t('budgetPlanner.add_new_category')}</h3>
+          <div className="bg-green-50 dark:bg-gray-800 p-4 rounded-lg space-y-3">
+            <h3 className="font-medium text-gray-700 dark:text-gray-100">{t('budgetPlanner.add_new_category')}</h3>
             <div className="flex gap-2 items-center">
               <Input
                 placeholder={t('budgetPlanner.category_name')}
@@ -173,7 +173,7 @@ export const BudgetPlanner = () => {
             {categories.map((category) => {
               const isEditing = editId === category.id;
               return (
-                <div key={category.id} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
+                <div key={category.id} className="flex items-center gap-3 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800">
                   <span className="w-4 h-4 rounded-full" style={{ background: category.color, display: 'inline-block' }} />
                   {isEditing ? (
                     <>
@@ -183,7 +183,7 @@ export const BudgetPlanner = () => {
                         className="flex-1 font-medium"
                       />
                       <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">{currency}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{currency}</span>
                         <Input
                           type="number"
                           value={editAmount}
@@ -210,7 +210,7 @@ export const BudgetPlanner = () => {
                           setEditId(null);
                         }}
                         size="sm"
-                        className="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100"
+                        className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 bg-green-50 dark:bg-gray-800 hover:bg-green-100 dark:hover:bg-gray-700"
                         title={t('save')}
                       >
                         <Check size={16} />
@@ -219,7 +219,7 @@ export const BudgetPlanner = () => {
                         onClick={() => setEditId(null)}
                         size="sm"
                         variant="ghost"
-                        className="text-gray-400 hover:text-red-500"
+                        className="text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
                         title={t('cancel')}
                       >
                         <X size={16} />
@@ -234,7 +234,7 @@ export const BudgetPlanner = () => {
                         tabIndex={-1}
                       />
                       <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">{currency}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{currency}</span>
                         <Input
                           type="number"
                           value={category.plannedAmount}
@@ -252,7 +252,7 @@ export const BudgetPlanner = () => {
                         }}
                         size="sm"
                         variant="ghost"
-                        className="text-blue-500 hover:text-blue-700"
+                        className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                         title={t('edit')}
                       >
                         <Pencil size={16} />
@@ -261,7 +261,7 @@ export const BudgetPlanner = () => {
                         onClick={() => handleDeleteCategory(category.id)}
                         variant="ghost"
                         size="sm"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900"
                         title={t('delete')}
                       >
                         <Trash2 size={16} />
@@ -274,10 +274,10 @@ export const BudgetPlanner = () => {
           </div>
 
           {/* Total */}
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
             <div className="flex justify-between items-center">
-              <span className="font-medium text-gray-700">{t('budgetPlanner.total_monthly_budget')}</span>
-              <span className="text-xl font-bold text-green-600">{currency}{totalPlanned.toFixed(2)}</span>
+              <span className="font-medium text-gray-700 dark:text-gray-100">{t('budgetPlanner.total_monthly_budget')}</span>
+              <span className="text-xl font-bold text-green-600 dark:text-green-400">{currency}{totalPlanned.toFixed(2)}</span>
             </div>
           </div>
         </CardContent>

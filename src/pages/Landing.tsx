@@ -11,7 +11,10 @@ import {
   Smartphone,
   UserCheck,
   ChevronDown,
+  Moon,
+  Sun,
 } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const features = [
   {
@@ -97,7 +100,7 @@ const FAQAccordion: React.FC = () => {
         return (
           <div
             key={i}
-            className="bg-white rounded-lg shadow border border-gray-100"
+            className="bg-white dark:bg-gray-900 rounded-lg shadow border border-gray-100 dark:border-gray-800"
           >
             <button
               className="w-full flex justify-between items-center px-5 py-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
@@ -105,26 +108,22 @@ const FAQAccordion: React.FC = () => {
               aria-expanded={open}
               aria-controls={`faq-panel-${i}`}
             >
-              <span className="font-semibold text-black-700 text-base">
+              <span className="font-semibold text-black-700 dark:text-gray-100 text-base">
                 {faq.q}
               </span>
               <ChevronDown
-                className={`w-5 h-5 ml-2 transition-transform ${
-                  open ? "rotate-180" : ""
-                }`}
+                className={`w-5 h-5 ml-2 transition-transform ${open ? "rotate-180" : ""} dark:text-gray-200`}
               />
             </button>
             <div
               id={`faq-panel-${i}`}
-              className={`overflow-hidden transition-all duration-300 px-5 ${
-                open ? "max-h-40 py-2" : "max-h-0 py-0"
-              }`}
+              className={`overflow-hidden transition-all duration-300 px-5 ${open ? "max-h-40 py-2" : "max-h-0 py-0"}`}
               style={{
                 maxHeight: open ? "200px" : "0",
                 opacity: open ? 1 : 0,
               }}
             >
-              <div className="text-gray-600 text-base leading-relaxed">
+              <div className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
                 {faq.a}
               </div>
             </div>
@@ -139,16 +138,31 @@ const Landing: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { theme, setTheme } = useTheme();
+
+  // Ensure dark mode is default on mount
+  React.useEffect(() => {
+    if (theme === 'system') setTheme('dark');
+  }, []); // Only run on mount
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
       {/* Hero Section */}
-      <header className="relative w-full px-4 pt-10 pb-16 flex flex-col items-center text-center bg-gradient-to-b from-white/80 to-transparent">
+      <header className="relative w-full px-4 pt-10 pb-16 flex flex-col items-center text-center bg-gradient-to-b from-white/80 to-transparent dark:from-gray-900/90 dark:to-transparent">
+        {/* Theme Toggle Button */}
+        <button
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="absolute right-6 top-6 p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow transition z-20"
+          aria-label={theme === 'dark' ? t('settings.theme_light') : t('settings.theme_dark')}
+          title={theme === 'dark' ? t('settings.theme_light') : t('settings.theme_dark')}
+        >
+          {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
+        </button>
         {/* Dashboard button for signed-in users */}
         {user && (
           <button
             onClick={() => navigate("/dashboard")}
-            className="absolute right-6 top-6 px-4 py-1.5 border border-green-600 text-green-700 bg-white/80 rounded-lg shadow-sm font-medium hover:bg-green-50 transition z-10 flex items-center gap-2"
+            className="absolute right-20 top-6 px-4 py-1.5 border border-green-600 text-green-700 bg-white/80 rounded-lg shadow-sm font-medium hover:bg-green-50 transition z-10 flex items-center gap-2"
             aria-label={t("landing.go_to_dashboard")}
             title={t("landing.go_to_dashboard")}
           >
@@ -157,10 +171,10 @@ const Landing: React.FC = () => {
           </button>
         )}
         <img src="/logo.png" alt="SpendWise Logo" className="w-20 h-20 mb-4" />
-        <h1 className="text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
+        <h1 className="text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 leading-tight">
           Take Control of Your <span className="text-blue-600">Spending</span>
         </h1>
-        <p className="text-lg text-gray-600 max-w-xl mb-8">
+        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-xl mb-8">
           SpendWise is your privacy-first, Firebase-powered personal finance
           tracker. Plan, log, and understand your spending with ease—on any
           device.
@@ -171,7 +185,7 @@ const Landing: React.FC = () => {
         >
           Get Started Free
         </Link>
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-gray-400 dark:text-gray-500">
           {"No credit card required"}
         </span>
       </header>
@@ -181,13 +195,13 @@ const Landing: React.FC = () => {
         {features.map((f, i) => (
           <div
             key={i}
-            className="flex flex-col items-center bg-white rounded-xl shadow p-6 gap-3 border border-gray-100"
+            className="flex flex-col items-center bg-white dark:bg-gray-900 rounded-xl shadow p-6 gap-3 border border-gray-100 dark:border-gray-800"
           >
             <div>{f.icon}</div>
-            <div className="font-semibold text-gray-800 text-lg text-center">
+            <div className="font-semibold text-gray-800 dark:text-gray-100 text-lg text-center">
               {f.title}
             </div>
-            <div className="text-gray-500 text-center text-sm">{f.desc}</div>
+            <div className="text-gray-500 dark:text-gray-400 text-center text-sm">{f.desc}</div>
           </div>
         ))}
       </section>
@@ -221,9 +235,9 @@ const Landing: React.FC = () => {
             {testimonials.map((t, i) => (
               <div
                 key={i}
-                className="flex flex-col items-center gap-4 bg-white rounded-xl shadow p-6 border border-gray-100"
+                className="flex flex-col items-center gap-4 bg-white dark:bg-gray-900 rounded-xl shadow p-6 border border-gray-100 dark:border-gray-800"
               >
-                <blockquote className="italic text-base text-gray-700 text-center">
+                <blockquote className="italic text-base text-gray-700 dark:text-gray-200 text-center">
                   “{t.quote}”
                 </blockquote>
                 <div className="flex items-center gap-3 mt-2">
@@ -232,8 +246,8 @@ const Landing: React.FC = () => {
                     alt={t.name}
                     className="w-10 h-10 rounded-full border"
                   />
-                  <div className="text-gray-800 font-medium">{t.name}</div>
-                  <div className="text-gray-500 text-sm">{t.title}</div>
+                  <div className="text-gray-800 dark:text-gray-100 font-medium">{t.name}</div>
+                  <div className="text-gray-500 dark:text-gray-400 text-sm">{t.title}</div>
                 </div>
               </div>
             ))}
@@ -254,12 +268,12 @@ const Landing: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="w-full py-8 flex flex-col items-center text-gray-400 text-sm mt-auto">
+      <footer className="w-full py-8 flex flex-col items-center text-gray-400 dark:text-gray-500 text-sm mt-auto">
         <div className="mb-1 flex items-center gap-1">
           <span className="text-yellow-400">✨</span>
           <span>Crafted by</span>
-          <span className="font-semibold text-blue-500">Vibe Coding</span>
-          <span className="text-gray-400">|</span>
+          <span className="font-semibold text-blue-500 dark:text-blue-400">Vibe Coding</span>
+          <span className="text-gray-400 dark:text-gray-500">|</span>
           <a
             href="https://github.com/mberrishdev"
             className="hover:underline font-medium"

@@ -28,7 +28,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative bg-gradient-to-br from-blue-100 via-white to-green-100 overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center relative bg-gradient-to-br from-blue-100 via-white to-green-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 overflow-hidden">
       {/* Animated SVG blob background */}
       <svg
         className="absolute -top-32 -left-32 w-[500px] h-[500px] opacity-30 blur-2xl animate-pulse"
@@ -57,7 +57,7 @@ const Login: React.FC = () => {
           </radialGradient>
         </defs>
       </svg>
-      <div className="relative w-full max-w-md mx-auto rounded-3xl shadow-2xl bg-white/60 backdrop-blur-lg border border-white/40 p-8 flex flex-col items-center gap-8 z-10">
+      <div className="relative w-full max-w-md mx-auto rounded-3xl shadow-2xl bg-white/60 dark:bg-gray-900/90 backdrop-blur-lg border border-white/40 dark:border-gray-800 p-8 flex flex-col items-center gap-8 z-10">
         <div className="flex flex-col items-center gap-2 w-full">
           <a href="/">
             <img
@@ -66,10 +66,10 @@ const Login: React.FC = () => {
               className="w-12 h-12 mb-1"
             />
           </a>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1 text-center tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 mb-1 text-center tracking-tight">
             Welcome to SpendWise
           </h1>
-          <p className="text-gray-700 text-center text-base mb-2 max-w-xs">
+          <p className="text-gray-700 dark:text-gray-300 text-center text-base mb-2 max-w-xs">
             Plan, log, and understand your spending with privacy-first finance
             tracking.
           </p>
@@ -83,11 +83,11 @@ const Login: React.FC = () => {
                 className="w-16 h-16 rounded-full border shadow"
               />
             )}
-            <div className="text-lg font-semibold text-gray-800">
+            <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
               {user.displayName || "User"}
             </div>
-            <div className="text-gray-500 text-sm">{user.email}</div>
-            <div className="mt-4 text-green-600 font-medium">
+            <div className="text-gray-500 dark:text-gray-400 text-sm">{user.email}</div>
+            <div className="mt-4 text-green-600 dark:text-green-400 font-medium">
               You are logged in!
             </div>
           </div>
@@ -95,7 +95,7 @@ const Login: React.FC = () => {
           <>
             <button
               onClick={handleSignIn}
-              className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 active:scale-95 border border-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg text-lg shadow transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-95 border border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-100 font-semibold py-3 px-4 rounded-lg text-lg shadow transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:opacity-60 disabled:cursor-not-allowed"
               disabled={loading}
               style={{ boxShadow: "0 2px 8px 0 rgba(60,130,246,0.08)" }}
             >
@@ -147,13 +147,13 @@ const Login: React.FC = () => {
               )}
               {loading ? "Signing in..." : "Sign in with Google"}
             </button>
-            <div className="text-xs text-gray-500 text-center w-full mt-3">
+            <div className="text-xs text-gray-500 dark:text-gray-400 text-center w-full mt-3">
               No credit card required. We never see or sell your data.
             </div>
           </>
         )}
-        {error && <div className="text-red-500 mt-2 text-center">{error}</div>}
-        <div className="flex items-center gap-2 mt-6 text-xs text-gray-400">
+        {error && <div className="text-red-500 dark:text-red-400 mt-2 text-center">{error}</div>}
+        <div className="flex items-center gap-2 mt-6 text-xs text-gray-400 dark:text-gray-500">
           <span>Privacy-first. Secure by Firebase.</span>
         </div>
       </div>

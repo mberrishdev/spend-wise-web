@@ -109,10 +109,10 @@ export const DailyLog = () => {
     return (
       <div className="flex flex-col items-center justify-center h-full py-12">
         <div className="max-w-md w-full">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 flex flex-col items-center gap-3 shadow-sm">
+          <div className="bg-yellow-50 dark:bg-gray-900 border border-yellow-200 dark:border-gray-800 rounded-lg p-6 flex flex-col items-center gap-3 shadow-sm">
             <span className="text-4xl">🗂️</span>
-            <div className="text-lg font-medium text-gray-700 text-center">{t('dailyLog.no_categories')}</div>
-            <div className="text-sm text-gray-500 text-center">{t('dailyLog.go_to_budget_tab')}</div>
+            <div className="text-lg font-medium text-gray-700 dark:text-gray-100 text-center">{t('dailyLog.no_categories')}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 text-center">{t('dailyLog.go_to_budget_tab')}</div>
             <button
               onClick={() => navigate('/dashboard/budget')}
               className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
@@ -131,17 +131,17 @@ export const DailyLog = () => {
   return (
     <div className="space-y-6">
       {/* Quick Add Form */}
-      <Card className="border-blue-200 shadow-sm">
+      <Card className="border-blue-200 dark:border-gray-800 shadow-sm bg-white dark:bg-gray-900">
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
+          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
             ✍️ {t('dailyLog.log_today_expense')}
           </CardTitle>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             {t('dailyLog.quick_and_easy')}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <Calendar size={16} />
             <Input
               type="date"
@@ -165,7 +165,7 @@ export const DailyLog = () => {
           </Select>
 
           <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{currency}</span>
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">{currency}</span>
             <Input
               type="number"
               placeholder={t('dailyLog.amount_placeholder')}
@@ -180,7 +180,7 @@ export const DailyLog = () => {
             placeholder={t('dailyLog.note_placeholder')}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="resize-none"
+            className="resize-none dark:bg-gray-800 dark:text-gray-100"
             rows={2}
           />
 
@@ -192,32 +192,32 @@ export const DailyLog = () => {
       </Card>
 
       {/* Today's Summary */}
-      <Card className="border-gray-200">
+      <Card className="border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base text-gray-700">
+          <CardTitle className="text-base text-gray-700 dark:text-gray-100">
             📅 {t('dailyLog.todays_expenses')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between items-center mb-4">
-            <span className="text-gray-600">{t('dailyLog.total_spent_today')}</span>
-            <span className="text-xl font-bold text-blue-600">{currency}{todaysTotal.toFixed(2)}</span>
+            <span className="text-gray-600 dark:text-gray-300">{t('dailyLog.total_spent_today')}</span>
+            <span className="text-xl font-bold text-blue-600 dark:text-blue-400">{currency}{todaysTotal.toFixed(2)}</span>
           </div>
 
           <div className="space-y-2">
             {todaysExpenses.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">{t('dailyLog.no_expenses_logged')}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('dailyLog.no_expenses_logged')}</p>
             ) : (
               todaysExpenses.map((expense) => (
-                <div key={expense.id} className="flex justify-between items-start p-3 bg-gray-50 rounded-lg">
+                <div key={expense.id} className="flex justify-between items-start p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div className="flex-1">
-                    <div className="font-medium text-gray-800">{expense.category}</div>
+                    <div className="font-medium text-gray-800 dark:text-gray-100">{expense.category}</div>
                     {expense.note && (
-                      <div className="text-sm text-gray-600 mt-1">{expense.note}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">{expense.note}</div>
                     )}
                   </div>
                   <div className="text-right">
-                    <div className="font-medium text-gray-800">{currency}{expense.amount.toFixed(2)}</div>
+                    <div className="font-medium text-gray-800 dark:text-gray-100">{currency}{expense.amount.toFixed(2)}</div>
                   </div>
                 </div>
               ))

@@ -29,9 +29,9 @@ const DashboardLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-green-100 sticky top-0 z-10">
+      <div className="bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm border-b border-green-100 dark:border-gray-800 sticky top-0 z-10">
         <div className="max-w-md mx-auto px-2 sm:px-4 py-3 sm:py-4 relative flex items-center justify-center">
           <div className="absolute left-0 top-1/2 -translate-y-1/2">
             {user && (
@@ -53,7 +53,7 @@ const DashboardLayout = () => {
           <div>
             {user && (
               <div className="text-center mt-1">
-                <span className="text-base font-medium text-gray-700">
+                <span className="text-base font-medium text-gray-700 dark:text-gray-100">
                   {(() => {
                     const hour = new Date().getHours();
                     let greetingKey = 'good_morning';
@@ -67,11 +67,10 @@ const DashboardLayout = () => {
                 </span>
               </div>
             )}
-     
           </div>
           <button
             onClick={signOut}
-            className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-500 hover:text-red-600 px-2 py-1 rounded transition"
+            className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 px-2 py-1 rounded transition"
             title={t('app.logout')}
           >
             <LogOut size={18} />
@@ -88,7 +87,7 @@ const DashboardLayout = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-green-100">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/95 backdrop-blur-sm border-t border-green-100 dark:border-gray-800">
         <div className="max-w-md mx-auto px-4">
           <div className="flex justify-around py-2">
             {tabs.map((tab) => {
@@ -101,8 +100,8 @@ const DashboardLayout = () => {
                   className={({ isActive }) =>
                     `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
                       isActive
-                        ? "bg-green-100 text-green-700"
-                        : "text-gray-500 hover:text-gray-700"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
+                        : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
                     }`
                   }
                   end

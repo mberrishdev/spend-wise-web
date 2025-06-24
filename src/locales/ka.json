@@ -84,7 +84,11 @@
     "language_label": "ენა",
     "language_note": "აირჩიეთ თქვენთვის სასურველი ენა აპისთვის.",
     "period_section_description": "დააყენეთ თვიური ბიუჯეტის პერიოდის დასაწყისი და დასასრული.",
-    "currency": "ვალუტა"
+    "currency": "ვალუტა",
+    "theme": "თემა",
+    "theme_system": "სისტემა",
+    "theme_light": "ღია",
+    "theme_dark": "მუქი"
   },
   "add": "დამატება",
   "edit": "რედაქტირება",

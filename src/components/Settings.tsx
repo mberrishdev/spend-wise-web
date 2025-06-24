@@ -14,6 +14,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/integrations/firebase";
 import { useTranslation } from "react-i18next";
+import { Switch } from "@/components/ui/switch";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const CURRENCIES = [
   { code: "GEL", symbol: "₾" },
@@ -36,6 +38,7 @@ export const Settings = () => {
   const initialPeriod = useRef({ startDay: 25, endDay: 24 });
   const initialCurrency = useRef("₾");
   const initialLang = useRef(i18n.language);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     if (!uid) return;
@@ -140,24 +143,24 @@ export const Settings = () => {
   return (
     <div className="space-y-8">
       {/* Budget Period Section */}
-      <Card className="border-purple-200 shadow-sm mb-6">
+      <Card className="border-purple-200 shadow-sm mb-6 bg-white dark:bg-gray-900">
         <CardHeader className="pb-2 px-4 pt-4">
           <div className="flex items-center gap-2">
             <span className="text-2xl">📅</span>
             <div>
-              <CardTitle className="text-xl font-bold text-gray-800">
+              <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100">
                 {t("settings.configure_budget_month")}
               </CardTitle>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 {t("settings.period_section_description")}
               </p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4 px-4 pb-4">
-          <div className="bg-purple-50 rounded-lg p-4 flex flex-col md:flex-col gap-4">
+          <div className="bg-purple-50 dark:bg-gray-800 rounded-lg p-4 flex flex-col md:flex-col gap-4">
             <div className="flex-1">
-              <Label htmlFor="start-day">{t("settings.budget_month_starts")}</Label>
+              <Label htmlFor="start-day" className="text-gray-700 dark:text-gray-100">{t("settings.budget_month_starts")}</Label>
               <Input
                 id="start-day"
                 type="number"
@@ -165,7 +168,7 @@ export const Settings = () => {
                 max="31"
                 value={startDay}
                 onChange={e => setStartDay(parseInt(e.target.value) || 1)}
-                className={`w-full ${periodError ? "border-red-400" : ""}`}
+                className={`w-full dark:bg-gray-900 dark:text-gray-100 ${periodError ? "border-red-400" : ""}`}
                 aria-invalid={!!periodError}
               />
               {periodError && (
@@ -173,7 +176,7 @@ export const Settings = () => {
               )}
             </div>
             <div className="flex-1">
-              <Label htmlFor="end-day">{t("settings.budget_month_ends")}</Label>
+              <Label htmlFor="end-day" className="text-gray-700 dark:text-gray-100">{t("settings.budget_month_ends")}</Label>
               <Input
                 id="end-day"
                 type="number"
@@ -181,13 +184,13 @@ export const Settings = () => {
                 max="31"
                 value={endDay}
                 onChange={e => setEndDay(parseInt(e.target.value) || 1)}
-                className={`w-full ${periodError ? "border-red-400" : ""}`}
+                className={`w-full dark:bg-gray-900 dark:text-gray-100 ${periodError ? "border-red-400" : ""}`}
                 aria-invalid={!!periodError}
               />
             </div>
             <Button
               onClick={savePeriod}
-              className="bg-purple-600 hover:bg-purple-700 min-w-[140px] flex items-center justify-center rounded-lg shadow"
+              className="bg-purple-600 hover:bg-purple-700 min-w-[140px] flex items-center justify-center rounded-lg shadow text-white disabled:bg-purple-300 dark:disabled:bg-purple-900"
               disabled={!periodChanged || !!periodError || saving}
             >
               {saving && periodChanged ? <span className="animate-spin mr-2">⏳</span> : null}
@@ -195,32 +198,32 @@ export const Settings = () => {
               {t("settings.save_period")}
             </Button>
           </div>
-          <p className="text-xs text-gray-600 mt-2">{t("settings.eg_25")} / {t("settings.eg_24")}</p>
-          <div className="bg-gray-50 p-4 rounded-lg mt-2 flex items-center gap-3">
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{t("settings.eg_25")} / {t("settings.eg_24")}</p>
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mt-2 flex items-center gap-3">
             <span className="text-xl">ℹ️</span>
             <div>
-              <h4 className="font-medium text-gray-700 mb-1">{t("settings.current_period")}</h4>
-              <p className="text-sm text-gray-600">{t("settings.period_range", { startDay, endDay })}</p>
-              <p className="text-xs text-gray-500 mt-1">{t("settings.period_example")}</p>
+              <h4 className="font-medium text-gray-700 dark:text-gray-100 mb-1">{t("settings.current_period")}</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t("settings.period_range", { startDay, endDay })}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t("settings.period_example")}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Currency Section */}
-      <Card className="border-green-200 shadow-sm mb-6">
+      <Card className="border-green-200 shadow-sm mb-6 bg-white dark:bg-gray-900">
         <CardHeader className="pb-2 px-4 pt-4">
-          <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
+          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
             💱 {t("settings.currency")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 px-4 pb-4">
-          <Label htmlFor="currency">{t("settings.currency")}</Label>
+          <Label htmlFor="currency" className="text-gray-700 dark:text-gray-100">{t("settings.currency")}</Label>
           <select
             id="currency"
             value={currency}
             onChange={e => saveCurrency(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded dark:bg-gray-900 dark:text-gray-100"
             disabled={saving}
           >
             {CURRENCIES.map((c) => (
@@ -229,47 +232,84 @@ export const Settings = () => {
               </option>
             ))}
           </select>
-          <p className="text-xs text-gray-600">{t("settings.currency_note")}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400">{t("settings.currency_note")}</p>
         </CardContent>
       </Card>
 
       {/* Language Section */}
-      <Card className="border-blue-200 shadow-sm mb-6">
+      <Card className="border-blue-200 shadow-sm mb-6 bg-white dark:bg-gray-900">
         <CardHeader className="pb-2 px-4 pt-4">
-          <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
+          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
             🌐 {t("settings.language_label")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 px-4 pb-4">
-          <Label htmlFor="language">{t("settings.language_label")}</Label>
+          <Label htmlFor="language" className="text-gray-700 dark:text-gray-100">{t("settings.language_label")}</Label>
           <select
             id="language"
             value={i18n.language}
             onChange={e => saveLanguage(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded dark:bg-gray-900 dark:text-gray-100"
             disabled={saving}
           >
             <option value="en">English</option>
             <option value="ka">ქართული</option>
           </select>
-          <p className="text-xs text-gray-600">{t("settings.language_note")}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400">{t("settings.language_note")}</p>
+        </CardContent>
+      </Card>
+
+      {/* Theme Section */}
+      <Card className="border-gray-200 shadow-sm mb-6 bg-white dark:bg-gray-900">
+        <CardHeader className="pb-2 px-4 pt-4">
+          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
+            🌓 {t("settings.theme")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 px-4 pb-4">
+          <div className="flex items-center gap-4">
+            <Label htmlFor="theme-switch" className="flex-1 text-gray-700 dark:text-gray-100">{t("settings.theme")}</Label>
+            <div className="flex items-center gap-2">
+              <button
+                className={`px-2 py-1 rounded ${theme === 'system' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200'}`}
+                onClick={() => setTheme('system')}
+                type="button"
+              >
+                {t('settings.theme_system')}
+              </button>
+              <button
+                className={`px-2 py-1 rounded ${theme === 'light' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200'}`}
+                onClick={() => setTheme('light')}
+                type="button"
+              >
+                {t('settings.theme_light')}
+              </button>
+              <button
+                className={`px-2 py-1 rounded ${theme === 'dark' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200'}`}
+                onClick={() => setTheme('dark')}
+                type="button"
+              >
+                {t('settings.theme_dark')}
+              </button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
       {/* Actions Section */}
-      <Card className="border-orange-200 shadow-sm">
+      {/* <Card className="border-orange-200 shadow-sm bg-white dark:bg-gray-900">
         <CardHeader className="pb-2 px-4 pt-4">
-          <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
+          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
             🔄 {t("settings.period_management")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4">
-          <div className="bg-orange-50 p-4 rounded-lg space-y-3">
-            <p className="text-sm text-gray-700">{t("settings.archive_note")}</p>
+          <div className="bg-orange-50 dark:bg-gray-800 p-4 rounded-lg space-y-3">
+            <p className="text-sm text-gray-700 dark:text-gray-100">{t("settings.archive_note")}</p>
             <Button
               onClick={handleStartNewPeriod}
               variant="outline"
-              className="w-full border-orange-300 text-orange-700 hover:bg-orange-100 flex items-center justify-center"
+              className="w-full border-orange-300 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 flex items-center justify-center"
               disabled={saving}
             >
               {saving ? <span className="animate-spin mr-2">⏳</span> : null}
@@ -277,7 +317,7 @@ export const Settings = () => {
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 };

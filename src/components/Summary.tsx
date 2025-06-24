@@ -133,36 +133,36 @@ export const Summary = () => {
       {/* Overall Summary */}
       <Card className="border-purple-200 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
+          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
             📈 {t('summary.period_overview')}
           </CardTitle>
-          <p className="text-sm text-gray-600">{formatPeriodRange(period)}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{formatPeriodRange(period)}</p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {currency}
                 {totalActual.toFixed(2)}
               </div>
-              <div className="text-sm text-gray-600">{t('summary.spent')}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">{t('summary.spent')}</div>
             </div>
             <div className="text-center">
               <div
                 className={`text-2xl font-bold ${
-                  totalRemaining >= 0 ? "text-green-600" : "text-red-600"
+                  totalRemaining >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
                 }`}
               >
                 {currency}
                 {Math.abs(totalRemaining).toFixed(2)}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 {totalRemaining >= 0 ? t('summary.remaining') : t('summary.over_budget')}
               </div>
             </div>
           </div>
 
-          <div className="bg-gray-100 rounded-full h-3 mb-2">
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-full h-3 mb-2">
             <div
               className={`h-3 rounded-full transition-all duration-500 ${
                 totalPlanned > 0 && totalActual / totalPlanned <= 1
@@ -179,7 +179,7 @@ export const Summary = () => {
             ></div>
           </div>
 
-          <div className="text-center text-sm text-gray-600">
+          <div className="text-center text-sm text-gray-600 dark:text-gray-300">
             {totalPlanned > 0
               ? `${((totalActual / totalPlanned) * 100).toFixed(1)}%`
               : "0%"}{" "}
@@ -190,7 +190,7 @@ export const Summary = () => {
 
       {/* Category Breakdown */}
       <div className="space-y-3">
-        <h3 className="font-medium text-gray-700">📊 {t('summary.by_category')}</h3>
+        <h3 className="font-medium text-gray-700 dark:text-gray-100">📊 {t('summary.by_category')}</h3>
 
         {categorySummaries.map((summary) => {
           // Find the category object to get its color
@@ -201,7 +201,7 @@ export const Summary = () => {
           return (
             <Card
               key={summary.category}
-              className="border-gray-200 shadow-sm transition-transform hover:scale-[1.015] hover:shadow-md"
+              className="border-gray-200 dark:border-gray-800 shadow-sm transition-transform hover:scale-[1.015] hover:shadow-md"
               style={{ borderLeft: `8px solid ${color}`, background: bgColor }}
             >
               <CardContent className="p-4">
@@ -211,7 +211,7 @@ export const Summary = () => {
                     <span className="text-lg">
                       {getStatusEmoji(summary.percentage)}
                     </span>
-                    <span className="font-medium text-gray-800">
+                    <span className="font-medium text-gray-800 dark:text-gray-100">
                       {summary.category}
                     </span>
                   </div>
@@ -220,7 +220,7 @@ export const Summary = () => {
                       {currency}
                       {summary.actual.toFixed(2)}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                       {t('summary.of')} {currency}
                       {summary.planned.toFixed(2)}
                     </div>
@@ -239,7 +239,7 @@ export const Summary = () => {
                   </span>
                   <span
                     className={`font-medium ${
-                      summary.remaining >= 0 ? "text-green-600" : "text-red-600"
+                      summary.remaining >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
                     }`}
                   >
                     {summary.remaining >= 0
@@ -255,8 +255,8 @@ export const Summary = () => {
         })}
 
         {categorySummaries.length === 0 && (
-          <Card className="border-gray-200">
-            <CardContent className="p-6 text-center text-gray-500">
+          <Card className="border-gray-200 dark:border-gray-800">
+            <CardContent className="p-6 text-center text-gray-500 dark:text-gray-400">
               {t('summary.no_categories')}
               <br />
               {t('summary.go_to_budget_tab')}
