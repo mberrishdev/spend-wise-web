@@ -155,7 +155,7 @@ export const Settings = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4 px-4 pb-4">
-          <div className="bg-purple-50 rounded-lg p-4 flex flex-col md:flex-col md:items-center gap-4">
+          <div className="bg-purple-50 rounded-lg p-4 flex flex-col md:flex-col gap-4">
             <div className="flex-1">
               <Label htmlFor="start-day">{t("settings.budget_month_starts")}</Label>
               <Input
