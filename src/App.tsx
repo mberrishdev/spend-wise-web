@@ -13,6 +13,7 @@ import { DailyLog } from "@/components/DailyLog";
 import { Summary } from "@/components/Summary";
 import { Settings } from "@/components/Settings";
 import NotFound from "./pages/NotFound";
+import { Analytics } from "@vercel/analytics/react";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ const App = () => (
         </CurrencyProvider>
       </AuthProvider>
     </TooltipProvider>
+    <Analytics />
   </QueryClientProvider>
 );
 
