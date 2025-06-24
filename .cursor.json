@@ -1,0 +1,28 @@
+{
+  "projectName": "SpendWise",
+  "primaryLanguage": "TypeScript",
+  "framework": "React",
+  "i18n": {
+    "library": "react-i18next",
+    "defaultLanguage": "en",
+    "supportedLanguages": ["en", "ka"],
+    "localesPath": "src/locales"
+  },
+  "firebase": {
+    "used": true,
+    "features": ["auth", "firestore"]
+  },
+  "ui": {
+    "library": "TailwindCSS",
+    "componentStyle": "functional, minimal, modern"
+  },
+  "pwa": true,
+  "routing": "react-router",
+  "directoryStructure": {
+    "components": "src/components",
+    "pages": "src/pages",
+    "contexts": "src/contexts",
+    "utils": "src/utils"
+  },
+  "author": "mberrishdev"
+} 
