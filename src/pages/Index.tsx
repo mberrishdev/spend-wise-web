@@ -1,13 +1,23 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BudgetPlanner } from "@/components/BudgetPlanner";
 import { DailyLog } from "@/components/DailyLog";
 import { Summary } from "@/components/Summary";
 import { Settings } from "@/components/Settings";
+import { NewPeriodPrompt } from "@/components/NewPeriodPrompt";
 import { Calendar, PlusCircle, BarChart3, Settings as SettingsIcon } from "lucide-react";
+import { checkForNewPeriod } from "@/utils/periodManager";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("daily");
+  const [showNewPeriodPrompt, setShowNewPeriodPrompt] = useState(false);
+
+  useEffect(() => {
+    // Check for new period on app load
+    if (checkForNewPeriod()) {
+      setShowNewPeriodPrompt(true);
+    }
+  }, []);
 
   const tabs = [
     { id: "planner", label: "Budget", icon: Calendar },
@@ -78,6 +88,11 @@ const Index = () => {
 
       {/* Bottom padding to account for fixed navigation */}
       <div className="h-20"></div>
+
+      {/* New Period Prompt */}
+      {showNewPeriodPrompt && (
+        <NewPeriodPrompt onClose={() => setShowNewPeriodPrompt(false)} />
+      )}
     </div>
   );
 };

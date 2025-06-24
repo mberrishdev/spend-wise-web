@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import { archiveCurrentPeriod } from "@/utils/periodManager";
 
 interface MonthlyPeriod {
   startDay: number;
@@ -40,6 +41,14 @@ export const Settings = () => {
     toast({
       title: "Monthly period saved! 🎉",
       description: `Your budget month now runs from ${startDay}th to ${endDay}th`,
+    });
+  };
+
+  const handleStartNewPeriod = () => {
+    archiveCurrentPeriod();
+    toast({
+      title: "New period started! 🎉",
+      description: "Previous expenses have been archived and your budget is reset.",
     });
   };
 
@@ -102,6 +111,31 @@ export const Settings = () => {
             <p className="text-xs text-gray-500 mt-2">
               Example: June 25th → July 24th
             </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-orange-200 shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
+            🔄 Period Management
+          </CardTitle>
+          <p className="text-sm text-gray-600">
+            Manually start a new budget period
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-orange-50 p-4 rounded-lg space-y-3">
+            <p className="text-sm text-gray-700">
+              This will archive all current expenses and reset your spending to ₾0 while keeping your budget categories.
+            </p>
+            <Button 
+              onClick={handleStartNewPeriod} 
+              variant="outline" 
+              className="w-full border-orange-300 text-orange-700 hover:bg-orange-100"
+            >
+              Start New Period
+            </Button>
           </div>
         </CardContent>
       </Card>
