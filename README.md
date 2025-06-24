@@ -52,3 +52,7 @@ VITE_FIREBASE_MEASUREMENT_ID=your-measurement-id
 ---
 
 MIT License
+
+## ❤️ Made with
+
+SpendWise is crafted with care by [Vibe Coding](https://vibecoding.com), using [Lovable](https://lovable.so) and [Cursor](https://cursor.so) for a delightful developer experience.
