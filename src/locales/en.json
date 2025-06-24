@@ -83,7 +83,8 @@
     "start_new_period": "Start New Period",
     "language_label": "Language",
     "language_note": "Choose your preferred language for the app.",
-    "period_section_description": "Set the start and end day for your monthly budget period."
+    "period_section_description": "Set the start and end day for your monthly budget period.",
+    "currency": "Currency"
   },
   "add": "Add",
   "edit": "Edit",

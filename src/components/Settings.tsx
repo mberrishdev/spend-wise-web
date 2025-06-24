@@ -211,11 +211,11 @@ export const Settings = () => {
       <Card className="border-green-200 shadow-sm mb-6">
         <CardHeader className="pb-2 px-4 pt-4">
           <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
-            💱 {t("currency")}
+            💱 {t("settings.currency")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 px-4 pb-4">
-          <Label htmlFor="currency">{t("currency")}</Label>
+          <Label htmlFor="currency">{t("settings.currency")}</Label>
           <select
             id="currency"
             value={currency}
