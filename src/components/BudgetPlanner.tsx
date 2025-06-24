@@ -14,13 +14,6 @@ interface BudgetCategory {
   plannedAmount: number;
 }
 
-const defaultCategories: Omit<BudgetCategory, "id">[] = [
-  { name: "Food & Dining", plannedAmount: 500 },
-  { name: "Transport", plannedAmount: 200 },
-  { name: "Entertainment", plannedAmount: 150 },
-  { name: "Shopping", plannedAmount: 300 },
-];
-
 export const BudgetPlanner = () => {
   const { user } = useAuth();
   const uid = user?.uid;
@@ -37,17 +30,8 @@ export const BudgetPlanner = () => {
     setError(null);
     getCategories(uid)
       .then((cats) => {
-        if (cats.length === 0) {
-          // Add default categories to Firestore
-          Promise.all(defaultCategories.map(cat => addCategory(uid, cat))).then(async () => {
-            const newCats = await getCategories(uid);
-            setCategories(newCats);
-            setLoading(false);
-          });
-        } else {
-          setCategories(cats);
-          setLoading(false);
-        }
+        setCategories(cats);
+        setLoading(false);
       })
       .catch(() => {
         setError("Failed to load categories");
