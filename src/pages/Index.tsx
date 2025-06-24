@@ -1,23 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BudgetPlanner } from "@/components/BudgetPlanner";
 import { DailyLog } from "@/components/DailyLog";
 import { Summary } from "@/components/Summary";
 import { Settings } from "@/components/Settings";
 import { NewPeriodPrompt } from "@/components/NewPeriodPrompt";
-import { Calendar, PlusCircle, BarChart3, Settings as SettingsIcon, LogOut } from "lucide-react";
+import {
+  Calendar,
+  PlusCircle,
+  BarChart3,
+  Settings as SettingsIcon,
+  LogOut,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("daily");
   const [showNewPeriodPrompt, setShowNewPeriodPrompt] = useState(false);
   const { signOut, user } = useAuth();
 
-  // useEffect(() => {
-  //   // Check for new period on app load
-  //   if (checkForNewPeriod()) {
-  //     setShowNewPeriodPrompt(true);
-  //   }
-  // }, []);
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   const tabs = [
     { id: "planner", label: "Budget", icon: Calendar },
@@ -47,7 +51,21 @@ const Index = () => {
       <div className="bg-white/80 backdrop-blur-sm border-b border-green-100 sticky top-0 z-10">
         <div className="max-w-md mx-auto px-4 py-4 relative flex items-center justify-center">
           <div className="absolute left-0 top-1/2 -translate-y-1/2">
-            {/* Optionally, user avatar or info could go here */}
+            {user && (
+              <Avatar>
+                <AvatarImage
+                  src={user.photoURL || undefined}
+                  alt={user.displayName || user.email || "User"}
+                />
+                <AvatarFallback>
+                  {user.displayName
+                    ? user.displayName[0]
+                    : user.email
+                    ? user.email[0]
+                    : "U"}
+                </AvatarFallback>
+              </Avatar>
+            )}
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-800 text-center">
@@ -63,15 +81,15 @@ const Index = () => {
             title="Log out"
           >
             <LogOut size={18} />
-            <span className="hidden sm:inline text-xs font-medium">Log out</span>
+            <span className="hidden sm:inline text-xs font-medium">
+              Log out
+            </span>
           </button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-md mx-auto px-4 py-6">
-        {renderContent()}
-      </div>
+      <div className="max-w-md mx-auto px-4 py-6">{renderContent()}</div>
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-green-100">
