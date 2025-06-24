@@ -3,7 +3,8 @@ import { useState } from "react";
 import { BudgetPlanner } from "@/components/BudgetPlanner";
 import { DailyLog } from "@/components/DailyLog";
 import { Summary } from "@/components/Summary";
-import { Calendar, PlusCircle, BarChart3 } from "lucide-react";
+import { Settings } from "@/components/Settings";
+import { Calendar, PlusCircle, BarChart3, Settings as SettingsIcon } from "lucide-react";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("daily");
@@ -12,6 +13,7 @@ const Index = () => {
     { id: "planner", label: "Budget", icon: Calendar },
     { id: "daily", label: "Log", icon: PlusCircle },
     { id: "summary", label: "Summary", icon: BarChart3 },
+    { id: "settings", label: "Settings", icon: SettingsIcon },
   ];
 
   const renderContent = () => {
@@ -22,6 +24,8 @@ const Index = () => {
         return <DailyLog />;
       case "summary":
         return <Summary />;
+      case "settings":
+        return <Settings />;
       default:
         return <DailyLog />;
     }
@@ -57,7 +61,7 @@ const Index = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex flex-col items-center py-2 px-4 rounded-lg transition-all duration-200 ${
+                  className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
                     isActive
                       ? "bg-green-100 text-green-700"
                       : "text-gray-500 hover:text-gray-700"

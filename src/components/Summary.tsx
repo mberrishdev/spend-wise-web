@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { getCurrentPeriodRange, formatPeriodRange, isDateInCurrentPeriod } from "@/utils/monthlyPeriod";
 
 interface Expense {
   id: string;
@@ -41,15 +42,15 @@ export const Summary = () => {
     }
   }, []);
 
-  // Get current month's expenses
-  const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
-  const monthlyExpenses = expenses.filter(expense => 
-    expense.date.startsWith(currentMonth)
-  );
+  // Get current period's expenses using custom monthly period
+  const currentPeriodExpenses = expenses.filter(expense => {
+    const expenseDate = new Date(expense.date);
+    return isDateInCurrentPeriod(expenseDate);
+  });
 
   // Calculate summary by category
   const categorySummaries: CategorySummary[] = categories.map(category => {
-    const categoryExpenses = monthlyExpenses.filter(expense => 
+    const categoryExpenses = currentPeriodExpenses.filter(expense => 
       expense.category === category.name
     );
     const actual = categoryExpenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -66,7 +67,7 @@ export const Summary = () => {
   });
 
   const totalPlanned = categories.reduce((sum, cat) => sum + cat.plannedAmount, 0);
-  const totalActual = monthlyExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalActual = currentPeriodExpenses.reduce((sum, expense) => sum + expense.amount, 0);
   const totalRemaining = totalPlanned - totalActual;
 
   const getProgressColor = (percentage: number) => {
@@ -88,8 +89,11 @@ export const Summary = () => {
       <Card className="border-purple-200 shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
-            📈 Monthly Overview
+            📈 Period Overview
           </CardTitle>
+          <p className="text-sm text-gray-600">
+            {formatPeriodRange()}
+          </p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4 mb-4">
