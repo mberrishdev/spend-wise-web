@@ -83,6 +83,7 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",
+    "vite-plugin-git-revision": "^0.1.9",
     "vite-plugin-pwa": "^1.0.0"
   }
 }

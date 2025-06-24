@@ -26,6 +26,7 @@ interface BudgetCategory {
   id: string;
   name: string;
   plannedAmount: number;
+  color?: string;
 }
 
 interface CategorySummary {
@@ -191,51 +192,67 @@ export const Summary = () => {
       <div className="space-y-3">
         <h3 className="font-medium text-gray-700">📊 {t('summary.by_category')}</h3>
 
-        {categorySummaries.map((summary) => (
-          <Card key={summary.category} className="border-gray-200">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">
-                    {getStatusEmoji(summary.percentage)}
+        {categorySummaries.map((summary) => {
+          // Find the category object to get its color
+          const cat = categories.find(c => c.name === summary.category);
+          const color = cat?.color || '#60a5fa';
+          // Create a soft background color with opacity
+          const bgColor = color + '20'; // e.g. #60a5fa20 for 12.5% opacity
+          return (
+            <Card
+              key={summary.category}
+              className="border-gray-200 shadow-sm transition-transform hover:scale-[1.015] hover:shadow-md"
+              style={{ borderLeft: `8px solid ${color}`, background: bgColor }}
+            >
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full border border-white shadow" style={{ background: color, display: 'inline-block' }} />
+                    <span className="text-lg">
+                      {getStatusEmoji(summary.percentage)}
+                    </span>
+                    <span className="font-medium text-gray-800">
+                      {summary.category}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-medium">
+                      {currency}
+                      {summary.actual.toFixed(2)}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {t('summary.of')} {currency}
+                      {summary.planned.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+
+                <Progress
+                  value={summary.percentage}
+                  className="h-2 mb-2"
+                  style={{ background: color }}
+                />
+
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">
+                    {summary.percentage.toFixed(1)}% {t('summary.used')}
                   </span>
-                  <span className="font-medium text-gray-800">
-                    {summary.category}
+                  <span
+                    className={`font-medium ${
+                      summary.remaining >= 0 ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {summary.remaining >= 0
+                      ? currency + summary.remaining.toFixed(2) + ` ${t('summary.left')}`
+                      : currency +
+                        Math.abs(summary.remaining).toFixed(2) +
+                        ` ${t('summary.over')}`}
                   </span>
                 </div>
-                <div className="text-right">
-                  <div className="font-medium">
-                    {currency}
-                    {summary.actual.toFixed(2)}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {t('summary.of')} {currency}
-                    {summary.planned.toFixed(2)}
-                  </div>
-                </div>
-              </div>
-
-              <Progress value={summary.percentage} className="h-2 mb-2" />
-
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">
-                  {summary.percentage.toFixed(1)}% {t('summary.used')}
-                </span>
-                <span
-                  className={`font-medium ${
-                    summary.remaining >= 0 ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {summary.remaining >= 0
-                    ? currency + summary.remaining.toFixed(2) + ` ${t('summary.left')}`
-                    : currency +
-                      Math.abs(summary.remaining).toFixed(2) +
-                      ` ${t('summary.over')}`}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
 
         {categorySummaries.length === 0 && (
           <Card className="border-gray-200">

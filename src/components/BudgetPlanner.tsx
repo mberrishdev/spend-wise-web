@@ -13,6 +13,7 @@ interface BudgetCategory {
   id: string;
   name: string;
   plannedAmount: number;
+  color: string;
 }
 
 export const BudgetPlanner = () => {
@@ -22,11 +23,13 @@ export const BudgetPlanner = () => {
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryAmount, setNewCategoryAmount] = useState("");
+  const [newCategoryColor, setNewCategoryColor] = useState('#60a5fa');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editAmount, setEditAmount] = useState("");
+  const [editColor, setEditColor] = useState('#60a5fa');
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -64,9 +67,11 @@ export const BudgetPlanner = () => {
       await addCategory(uid, {
         name: newCategoryName.trim(),
         plannedAmount: parseFloat(newCategoryAmount),
+        color: newCategoryColor,
       });
       setNewCategoryName("");
       setNewCategoryAmount("");
+      setNewCategoryColor('#60a5fa');
       toast({ title: t('budgetPlanner.category_added') });
       const updated = await getCategories(uid);
       setCategories(updated);
@@ -136,7 +141,7 @@ export const BudgetPlanner = () => {
           {/* Add new category */}
           <div className="bg-green-50 p-4 rounded-lg space-y-3">
             <h3 className="font-medium text-gray-700">{t('budgetPlanner.add_new_category')}</h3>
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <Input
                 placeholder={t('budgetPlanner.category_name')}
                 value={newCategoryName}
@@ -150,6 +155,13 @@ export const BudgetPlanner = () => {
                 onChange={(e) => setNewCategoryAmount(e.target.value)}
                 className="w-24"
               />
+              <input
+                type="color"
+                value={newCategoryColor}
+                onChange={e => setNewCategoryColor(e.target.value)}
+                title={t('budgetPlanner.pick_color', 'Pick color')}
+                className="w-8 h-8 p-0 border-0 bg-transparent cursor-pointer"
+              />
               <Button onClick={handleAddCategory} size="sm" className="bg-green-600 hover:bg-green-700">
                 <PlusCircle size={16} />
               </Button>
@@ -162,6 +174,7 @@ export const BudgetPlanner = () => {
               const isEditing = editId === category.id;
               return (
                 <div key={category.id} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
+                  <span className="w-4 h-4 rounded-full" style={{ background: category.color, display: 'inline-block' }} />
                   {isEditing ? (
                     <>
                       <Input
@@ -177,6 +190,13 @@ export const BudgetPlanner = () => {
                           onChange={(e) => setEditAmount(e.target.value)}
                           className="w-20 text-right"
                         />
+                        <input
+                          type="color"
+                          value={editColor}
+                          onChange={e => setEditColor(e.target.value)}
+                          className="w-8 h-8 p-0 border-0 bg-transparent cursor-pointer"
+                          title={t('budgetPlanner.pick_color', 'Pick color')}
+                        />
                       </div>
                       <Button
                         onClick={async () => {
@@ -186,6 +206,7 @@ export const BudgetPlanner = () => {
                           }
                           await handleUpdateCategory(category.id, "name", editName.trim());
                           await handleUpdateCategory(category.id, "plannedAmount", parseFloat(editAmount));
+                          await handleUpdateCategory(category.id, "color", editColor);
                           setEditId(null);
                         }}
                         size="sm"
@@ -227,6 +248,7 @@ export const BudgetPlanner = () => {
                           setEditId(category.id);
                           setEditName(category.name);
                           setEditAmount(category.plannedAmount.toString());
+                          setEditColor(category.color || '#60a5fa');
                         }}
                         size="sm"
                         variant="ghost"

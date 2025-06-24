@@ -14,6 +14,7 @@ interface BudgetCategory {
   id: string;
   name: string;
   plannedAmount: number;
+  color: string; // hex code
 }
 
 interface ArchivedPeriod {
@@ -46,12 +47,20 @@ export async function deleteExpense(uid: string, expenseId: string): Promise<voi
 export async function getCategories(uid: string): Promise<BudgetCategory[]> {
   const col = collection(db, 'users', uid, 'categories');
   const snap = await getDocs(col);
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as BudgetCategory));
+  return snap.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name,
+      plannedAmount: data.plannedAmount,
+      color: data.color || '#60a5fa', // default blue if missing
+    } as BudgetCategory;
+  });
 }
 
 export async function addCategory(uid: string, category: Omit<BudgetCategory, 'id'>): Promise<void> {
   const col = collection(db, 'users', uid, 'categories');
-  await addDoc(col, category);
+  await addDoc(col, { ...category, color: category.color || '#60a5fa' });
 }
 
 export async function updateCategory(uid: string, categoryId: string, data: Partial<BudgetCategory>): Promise<void> {
