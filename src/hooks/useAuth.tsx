@@ -1,4 +1,3 @@
-// NOTE: This file must be .tsx because it contains JSX.
 import { useEffect, useState, useContext, createContext, ReactNode } from "react";
 import { GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/integrations/firebase";

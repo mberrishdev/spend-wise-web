@@ -44,11 +44,7 @@ const App = () => (
           <BrowserRouter>
             <React.Suspense fallback={null}>
               <Routes>
-                <Route path="/" element={
-                  <RedirectIfAuth>
-                    <Landing />
-                  </RedirectIfAuth>
-                } />
+                <Route path="/" element={<Landing />} />
                 <Route path="/login" element={
                   <RedirectIfAuth>
                     <Login />

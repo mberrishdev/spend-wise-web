@@ -116,5 +116,9 @@
   "app": {
     "subtitle": "Your mindful spending companion",
     "logout": "Log out"
+  },
+  "landing": {
+    "get_started": "Get Started Free",
+    "go_to_dashboard": "Go to Dashboard"
   }
 }
