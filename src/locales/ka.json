@@ -39,7 +39,9 @@
     "go_to_budget_button": "გადადით ბიუჯეტზე",
     "expense_deleted": "ხარჯი წაიშალა.",
     "expense_updated": "ხარჯი განახლდა.",
-    "note_placeholder": "რისთვის იყო? (არასავალდებულო)"
+    "note_placeholder": "რისთვის იყო? (არასავალდებულო)",
+    "all_expenses": "ყველა ხარჯი",
+    "no_other_expenses": "სხვა ხარჯი არ მოიძებნა."
   },
   "summary": {
     "summary": "შეჯამება",

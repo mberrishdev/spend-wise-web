@@ -38,7 +38,9 @@
     "go_to_budget_tab": "Go to the Budget tab to add your first category.",
     "go_to_budget_button": "Go to Budget",
     "expense_deleted": "Expense deleted.",
-    "expense_updated": "Expense updated."
+    "expense_updated": "Expense updated.",
+    "all_expenses": "All Expenses",
+    "no_other_expenses": "No other expenses found."
   },
   "summary": {
     "summary": "Summary",
