@@ -33,7 +33,10 @@
     "add_expense": "ხარჯის დამატება",
     "todays_expenses": "დღევანდელი ხარჯები",
     "total_spent_today": "დღეს დახარჯული თანხა:",
-    "no_expenses_logged": "დღეს ხარჯი არ არის დამატებული"
+    "no_expenses_logged": "დღეს ხარჯი არ არის დამატებული",
+    "no_categories": "ჯერ არ გაქვთ კატეგორიები დამატებული.",
+    "go_to_budget_tab": "გადადით ბიუჯეტის ტაბზე კატეგორიის დასამატებლად.",
+    "go_to_budget_button": "გადადით ბიუჯეტზე"
   },
   "summary": {
     "summary": "შეჯამება",

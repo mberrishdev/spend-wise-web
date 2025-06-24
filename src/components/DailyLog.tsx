@@ -10,6 +10,7 @@ import { getExpenses, addExpense, getCategories } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 interface Expense {
   id: string;
@@ -38,6 +39,7 @@ export const DailyLog = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // Load data from Firestore
   useEffect(() => {
@@ -100,6 +102,27 @@ export const DailyLog = () => {
   }
   if (error) {
     return <div className="text-center text-red-500 py-8">{error}</div>;
+  }
+
+  // If no categories, show a friendly empty state
+  if (categories.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full py-12">
+        <div className="max-w-md w-full">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 flex flex-col items-center gap-3 shadow-sm">
+            <span className="text-4xl">🗂️</span>
+            <div className="text-lg font-medium text-gray-700 text-center">{t('dailyLog.no_categories')}</div>
+            <div className="text-sm text-gray-500 text-center">{t('dailyLog.go_to_budget_tab')}</div>
+            <button
+              onClick={() => navigate('/dashboard/budget')}
+              className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+            >
+              {t('dailyLog.go_to_budget_button')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const todaysExpenses = expenses.filter(expense => expense.date === date);
