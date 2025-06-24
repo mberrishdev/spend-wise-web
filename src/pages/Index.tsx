@@ -29,7 +29,7 @@ const DashboardLayout = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-green-100 sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-4 py-4 relative flex items-center justify-center">
+        <div className="max-w-md mx-auto px-2 sm:px-4 py-3 sm:py-4 relative flex items-center justify-center">
           <div className="absolute left-0 top-1/2 -translate-y-1/2">
             {user && (
               <Avatar>
