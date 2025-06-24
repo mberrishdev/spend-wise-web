@@ -195,26 +195,28 @@ const Landing: React.FC = () => (
         </span>
         <div className="flex-grow h-px bg-gradient-to-l from-transparent via-blue-200 to-transparent" />
       </div>
-      <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-3 gap-8">
-        {testimonials.map((t, i) => (
-          <div
-            key={i}
-            className="flex flex-col items-center gap-4 bg-white rounded-xl shadow p-6 border border-gray-100"
-          >
-            <blockquote className="italic text-base text-gray-700 text-center">
-              “{t.quote}”
-            </blockquote>
-            <div className="flex items-center gap-3 mt-2">
-              <img
-                src={t.avatar}
-                alt={t.name}
-                className="w-10 h-10 rounded-full border"
-              />
-              <div className="text-gray-800 font-medium">{t.name}</div>
-              <div className="text-gray-500 text-sm">{t.title}</div>
+      <div className="max-w-4xl w-full flex justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full md:w-auto justify-items-center">
+          {testimonials.map((t, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center gap-4 bg-white rounded-xl shadow p-6 border border-gray-100"
+            >
+              <blockquote className="italic text-base text-gray-700 text-center">
+                “{t.quote}”
+              </blockquote>
+              <div className="flex items-center gap-3 mt-2">
+                <img
+                  src={t.avatar}
+                  alt={t.name}
+                  className="w-10 h-10 rounded-full border"
+                />
+                <div className="text-gray-800 font-medium">{t.name}</div>
+                <div className="text-gray-500 text-sm">{t.title}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
 
@@ -232,6 +234,21 @@ const Landing: React.FC = () => (
 
     {/* Footer */}
     <footer className="w-full py-8 flex flex-col items-center text-gray-400 text-sm mt-auto">
+      <div className="mb-1 flex items-center gap-1">
+        <span className="text-yellow-400">✨</span>
+        <span>Crafted by</span>
+        <span className="font-semibold text-blue-500">Vibe Coding</span>
+        <span className="text-gray-400">|</span>
+        <a
+          href="https://github.com/mberrishdev"
+          className="hover:underline font-medium"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span className="mr-1">👨‍💻</span>@mberrishdev
+        </a>
+      </div>
+      <br/>
       <div className="mb-2">
         &copy; {new Date().getFullYear()} SpendWise. All rights reserved.
       </div>
