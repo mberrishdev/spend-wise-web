@@ -19,10 +19,6 @@ const Index = () => {
   const [showNewPeriodPrompt, setShowNewPeriodPrompt] = useState(false);
   const { signOut, user } = useAuth();
 
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-
   const tabs = [
     { id: "planner", label: "Budget", icon: Calendar },
     { id: "daily", label: "Log", icon: PlusCircle },
