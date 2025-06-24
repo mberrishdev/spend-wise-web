@@ -1,20 +1,28 @@
+import { db } from '@/integrations/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-interface MonthlyPeriod {
+export interface MonthlyPeriod {
   startDay: number;
   endDay: number;
 }
 
-export const getMonthlyPeriod = (): MonthlyPeriod => {
-  const savedPeriod = localStorage.getItem("spendwise-monthly-period");
-  if (savedPeriod) {
-    return JSON.parse(savedPeriod);
+export async function getMonthlyPeriod(uid: string): Promise<MonthlyPeriod> {
+  const ref = doc(db, 'users', uid, 'monthlyPlan', 'main');
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    return snap.data() as MonthlyPeriod;
   }
   // Default: 25th to 24th
   return { startDay: 25, endDay: 24 };
-};
+}
 
-export const getCurrentPeriodRange = (): { start: Date; end: Date } => {
-  const { startDay, endDay } = getMonthlyPeriod();
+export async function setMonthlyPeriod(uid: string, period: MonthlyPeriod): Promise<void> {
+  const ref = doc(db, 'users', uid, 'monthlyPlan', 'main');
+  await setDoc(ref, period, { merge: true });
+}
+
+export const getCurrentPeriodRange = (period: MonthlyPeriod): { start: Date; end: Date } => {
+  const { startDay, endDay } = period;
   const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth();
@@ -36,13 +44,13 @@ export const getCurrentPeriodRange = (): { start: Date; end: Date } => {
   return { start: periodStart, end: periodEnd };
 };
 
-export const isDateInCurrentPeriod = (date: Date): boolean => {
-  const { start, end } = getCurrentPeriodRange();
+export const isDateInCurrentPeriod = (date: Date, period: MonthlyPeriod): boolean => {
+  const { start, end } = getCurrentPeriodRange(period);
   return date >= start && date <= end;
 };
 
-export const formatPeriodRange = (): string => {
-  const { start, end } = getCurrentPeriodRange();
+export const formatPeriodRange = (period: MonthlyPeriod): string => {
+  const { start, end } = getCurrentPeriodRange(period);
   const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   return `${startStr} - ${endStr}`;

@@ -1,23 +1,23 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { BudgetPlanner } from "@/components/BudgetPlanner";
 import { DailyLog } from "@/components/DailyLog";
 import { Summary } from "@/components/Summary";
 import { Settings } from "@/components/Settings";
 import { NewPeriodPrompt } from "@/components/NewPeriodPrompt";
-import { Calendar, PlusCircle, BarChart3, Settings as SettingsIcon } from "lucide-react";
-import { checkForNewPeriod } from "@/utils/periodManager";
+import { Calendar, PlusCircle, BarChart3, Settings as SettingsIcon, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("daily");
   const [showNewPeriodPrompt, setShowNewPeriodPrompt] = useState(false);
+  const { signOut, user } = useAuth();
 
-  useEffect(() => {
-    // Check for new period on app load
-    if (checkForNewPeriod()) {
-      setShowNewPeriodPrompt(true);
-    }
-  }, []);
+  // useEffect(() => {
+  //   // Check for new period on app load
+  //   if (checkForNewPeriod()) {
+  //     setShowNewPeriodPrompt(true);
+  //   }
+  // }, []);
 
   const tabs = [
     { id: "planner", label: "Budget", icon: Calendar },
@@ -45,13 +45,26 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-green-100 sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-gray-800 text-center">
-            💰 SpendWise
-          </h1>
-          <p className="text-sm text-gray-600 text-center mt-1">
-            Your mindful spending companion
-          </p>
+        <div className="max-w-md mx-auto px-4 py-4 relative flex items-center justify-center">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2">
+            {/* Optionally, user avatar or info could go here */}
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800 text-center">
+              💰 SpendWise
+            </h1>
+            <p className="text-sm text-gray-600 text-center mt-1">
+              Your mindful spending companion
+            </p>
+          </div>
+          <button
+            onClick={signOut}
+            className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-500 hover:text-red-600 px-2 py-1 rounded transition"
+            title="Log out"
+          >
+            <LogOut size={18} />
+            <span className="hidden sm:inline text-xs font-medium">Log out</span>
+          </button>
         </div>
       </div>
 

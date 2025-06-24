@@ -1,18 +1,20 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { checkForNewPeriod, archiveCurrentPeriod, markPeriodAsChecked } from "@/utils/periodManager";
-import { formatPeriodRange } from "@/utils/monthlyPeriod";
+import { archiveCurrentPeriod } from "@/utils/periodManager";
+import { formatPeriodRange, MonthlyPeriod } from "@/utils/monthlyPeriod";
 
 interface NewPeriodPromptProps {
   onClose: () => void;
 }
 
+const dummyPeriod: MonthlyPeriod = { startDay: 25, endDay: 24 }; // TODO: get real period
+
 export const NewPeriodPrompt = ({ onClose }: NewPeriodPromptProps) => {
+  // TODO: Get uid and expenses from props or context
   const handleArchiveAndStart = () => {
-    archiveCurrentPeriod();
+    // archiveCurrentPeriod(uid, expenses)
     toast({
       title: "New period started! 🎉",
       description: "Previous expenses have been archived and your budget is ready for the new month.",
@@ -21,7 +23,7 @@ export const NewPeriodPrompt = ({ onClose }: NewPeriodPromptProps) => {
   };
 
   const handleContinue = () => {
-    markPeriodAsChecked();
+    // No-op for Firestore, just close
     onClose();
   };
 
@@ -33,7 +35,7 @@ export const NewPeriodPrompt = ({ onClose }: NewPeriodPromptProps) => {
             🗓️ New Budget Period Detected
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Current period: {formatPeriodRange()}
+            Current period: {formatPeriodRange(dummyPeriod)}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">

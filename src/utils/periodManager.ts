@@ -1,5 +1,6 @@
-
-import { getCurrentPeriodRange, getMonthlyPeriod } from './monthlyPeriod';
+import { getCurrentPeriodRange } from './monthlyPeriod';
+import { db } from '@/integrations/firebase';
+import { collection, doc, getDocs, setDoc, addDoc, query, where, deleteDoc, updateDoc } from 'firebase/firestore';
 
 interface Expense {
   id: string;
@@ -7,6 +8,12 @@ interface Expense {
   category: string;
   amount: number;
   note: string;
+}
+
+interface BudgetCategory {
+  id: string;
+  name: string;
+  plannedAmount: number;
 }
 
 interface ArchivedPeriod {
@@ -18,62 +25,66 @@ interface ArchivedPeriod {
   archivedAt: string;
 }
 
-export const checkForNewPeriod = (): boolean => {
-  const lastCheckedPeriod = localStorage.getItem("spendwise-last-period");
-  const { start } = getCurrentPeriodRange();
-  const currentPeriodKey = `${start.getFullYear()}-${start.getMonth()}-${start.getDate()}`;
-  
-  if (!lastCheckedPeriod || lastCheckedPeriod !== currentPeriodKey) {
-    return true;
-  }
-  
-  return false;
-};
+// Firestore paths: users/{uid}/dailyLogs, users/{uid}/archive, users/{uid}/categories
 
-export const archiveCurrentPeriod = (): void => {
-  const expenses: Expense[] = JSON.parse(localStorage.getItem("spendwise-expenses") || "[]");
-  
-  if (expenses.length === 0) {
-    markPeriodAsChecked();
-    return;
-  }
+export async function getExpenses(uid: string): Promise<Expense[]> {
+  const col = collection(db, 'users', uid, 'dailyLogs');
+  const snap = await getDocs(col);
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Expense));
+}
 
+export async function addExpense(uid: string, expense: Omit<Expense, 'id'>): Promise<void> {
+  const col = collection(db, 'users', uid, 'dailyLogs');
+  await addDoc(col, expense);
+}
+
+export async function deleteExpense(uid: string, expenseId: string): Promise<void> {
+  const ref = doc(db, 'users', uid, 'dailyLogs', expenseId);
+  await deleteDoc(ref);
+}
+
+export async function getCategories(uid: string): Promise<BudgetCategory[]> {
+  const col = collection(db, 'users', uid, 'categories');
+  const snap = await getDocs(col);
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as BudgetCategory));
+}
+
+export async function addCategory(uid: string, category: Omit<BudgetCategory, 'id'>): Promise<void> {
+  const col = collection(db, 'users', uid, 'categories');
+  await addDoc(col, category);
+}
+
+export async function updateCategory(uid: string, categoryId: string, data: Partial<BudgetCategory>): Promise<void> {
+  const ref = doc(db, 'users', uid, 'categories', categoryId);
+  await updateDoc(ref, data);
+}
+
+export async function deleteCategory(uid: string, categoryId: string): Promise<void> {
+  const ref = doc(db, 'users', uid, 'categories', categoryId);
+  await deleteDoc(ref);
+}
+
+export async function getArchivedPeriods(uid: string): Promise<ArchivedPeriod[]> {
+  const col = collection(db, 'users', uid, 'archive');
+  const snap = await getDocs(col);
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ArchivedPeriod));
+}
+
+export async function archiveCurrentPeriod(uid: string, expenses: Expense[]): Promise<void> {
+  if (expenses.length === 0) return;
   const { start, end } = getCurrentPeriodRange();
   const previousPeriodStart = new Date(start);
   const previousPeriodEnd = new Date(end);
-  
-  // Adjust to get the previous period
   previousPeriodStart.setMonth(previousPeriodStart.getMonth() - 1);
   previousPeriodEnd.setMonth(previousPeriodEnd.getMonth() - 1);
-
   const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-
-  const archivedPeriod: ArchivedPeriod = {
-    id: Date.now().toString(),
+  const archivedPeriod: Omit<ArchivedPeriod, 'id'> = {
     periodStart: previousPeriodStart.toISOString(),
     periodEnd: previousPeriodEnd.toISOString(),
     expenses,
     totalSpent,
     archivedAt: new Date().toISOString(),
   };
-
-  // Save to archive
-  const existingArchive: ArchivedPeriod[] = JSON.parse(localStorage.getItem("spendwise-archive") || "[]");
-  existingArchive.push(archivedPeriod);
-  localStorage.setItem("spendwise-archive", JSON.stringify(existingArchive));
-
-  // Clear current expenses
-  localStorage.setItem("spendwise-expenses", "[]");
-  
-  markPeriodAsChecked();
-};
-
-export const markPeriodAsChecked = (): void => {
-  const { start } = getCurrentPeriodRange();
-  const currentPeriodKey = `${start.getFullYear()}-${start.getMonth()}-${start.getDate()}`;
-  localStorage.setItem("spendwise-last-period", currentPeriodKey);
-};
-
-export const getArchivedPeriods = (): ArchivedPeriod[] => {
-  return JSON.parse(localStorage.getItem("spendwise-archive") || "[]");
-};
+  const col = collection(db, 'users', uid, 'archive');
+  await addDoc(col, archivedPeriod);
+}

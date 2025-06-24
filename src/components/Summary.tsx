@@ -1,8 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { getCurrentPeriodRange, formatPeriodRange, isDateInCurrentPeriod } from "@/utils/monthlyPeriod";
+import { getCurrentPeriodRange, formatPeriodRange, isDateInCurrentPeriod, getMonthlyPeriod, MonthlyPeriod } from "@/utils/monthlyPeriod";
+import { getExpenses, getCategories } from "@/utils/periodManager";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Expense {
   id: string;
@@ -27,25 +28,46 @@ interface CategorySummary {
 }
 
 export const Summary = () => {
+  const { user } = useAuth();
+  const uid = user?.uid;
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
+  const [period, setPeriod] = useState<MonthlyPeriod | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedExpenses = localStorage.getItem("spendwise-expenses");
-    if (savedExpenses) {
-      setExpenses(JSON.parse(savedExpenses));
-    }
+    if (!uid) return;
+    setLoading(true);
+    setError(null);
+    Promise.all([
+      getExpenses(uid),
+      getCategories(uid),
+      getMonthlyPeriod(uid)
+    ])
+      .then(([expenses, categories, period]) => {
+        setExpenses(expenses);
+        setCategories(categories);
+        setPeriod(period);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Failed to load summary data");
+        setLoading(false);
+      });
+  }, [uid]);
 
-    const savedCategories = localStorage.getItem("spendwise-categories");
-    if (savedCategories) {
-      setCategories(JSON.parse(savedCategories));
-    }
-  }, []);
+  if (loading) {
+    return <div className="text-center text-gray-500 py-8">Loading...</div>;
+  }
+  if (error || !period) {
+    return <div className="text-center text-red-500 py-8">{error || "No period data"}</div>;
+  }
 
   // Get current period's expenses using custom monthly period
   const currentPeriodExpenses = expenses.filter(expense => {
     const expenseDate = new Date(expense.date);
-    return isDateInCurrentPeriod(expenseDate);
+    return isDateInCurrentPeriod(expenseDate, period);
   });
 
   // Calculate summary by category
@@ -92,7 +114,7 @@ export const Summary = () => {
             📈 Period Overview
           </CardTitle>
           <p className="text-sm text-gray-600">
-            {formatPeriodRange()}
+            {formatPeriodRange(period)}
           </p>
         </CardHeader>
         <CardContent>

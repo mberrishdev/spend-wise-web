@@ -1,31 +1,38 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { archiveCurrentPeriod } from "@/utils/periodManager";
-
-interface MonthlyPeriod {
-  startDay: number;
-  endDay: number;
-}
+import { archiveCurrentPeriod, getExpenses } from "@/utils/periodManager";
+import { getMonthlyPeriod, setMonthlyPeriod, MonthlyPeriod } from "@/utils/monthlyPeriod";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Settings = () => {
+  const { user } = useAuth();
+  const uid = user?.uid;
   const [startDay, setStartDay] = useState(25);
   const [endDay, setEndDay] = useState(24);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedPeriod = localStorage.getItem("spendwise-monthly-period");
-    if (savedPeriod) {
-      const period: MonthlyPeriod = JSON.parse(savedPeriod);
-      setStartDay(period.startDay);
-      setEndDay(period.endDay);
-    }
-  }, []);
+    if (!uid) return;
+    setLoading(true);
+    setError(null);
+    getMonthlyPeriod(uid)
+      .then((period) => {
+        setStartDay(period.startDay);
+        setEndDay(period.endDay);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Failed to load period settings");
+        setLoading(false);
+      });
+  }, [uid]);
 
-  const savePeriod = () => {
+  const savePeriod = async () => {
     if (startDay < 1 || startDay > 31 || endDay < 1 || endDay > 31) {
       toast({
         title: "Invalid day range",
@@ -34,23 +41,39 @@ export const Settings = () => {
       });
       return;
     }
-
+    if (!uid) return;
     const period: MonthlyPeriod = { startDay, endDay };
-    localStorage.setItem("spendwise-monthly-period", JSON.stringify(period));
-    
-    toast({
-      title: "Monthly period saved! 🎉",
-      description: `Your budget month now runs from ${startDay}th to ${endDay}th`,
-    });
+    try {
+      await setMonthlyPeriod(uid, period);
+      toast({
+        title: "Monthly period saved! 🎉",
+        description: `Your budget month now runs from ${startDay}th to ${endDay}th`,
+      });
+    } catch {
+      toast({ title: "Failed to save period", variant: "destructive" });
+    }
   };
 
-  const handleStartNewPeriod = () => {
-    archiveCurrentPeriod();
-    toast({
-      title: "New period started! 🎉",
-      description: "Previous expenses have been archived and your budget is reset.",
-    });
+  const handleStartNewPeriod = async () => {
+    if (!uid) return;
+    try {
+      const expenses = await getExpenses(uid);
+      await archiveCurrentPeriod(uid, expenses);
+      toast({
+        title: "New period started! 🎉",
+        description: "Previous expenses have been archived and your budget is reset.",
+      });
+    } catch {
+      toast({ title: "Failed to archive period", variant: "destructive" });
+    }
   };
+
+  if (loading) {
+    return <div className="text-center text-gray-500 py-8">Loading...</div>;
+  }
+  if (error) {
+    return <div className="text-center text-red-500 py-8">{error}</div>;
+  }
 
   return (
     <div className="space-y-6">

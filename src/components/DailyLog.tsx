@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle, Calendar } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { getExpenses, addExpense, getCategories } from "@/utils/periodManager";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Expense {
   id: string;
@@ -23,34 +24,38 @@ interface BudgetCategory {
 }
 
 export const DailyLog = () => {
+  const { user } = useAuth();
+  const uid = user?.uid;
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load data from localStorage
+  // Load data from Firestore
   useEffect(() => {
-    const savedExpenses = localStorage.getItem("spendwise-expenses");
-    if (savedExpenses) {
-      setExpenses(JSON.parse(savedExpenses));
-    }
+    if (!uid) return;
+    setLoading(true);
+    setError(null);
+    Promise.all([
+      getExpenses(uid),
+      getCategories(uid)
+    ])
+      .then(([expenses, categories]) => {
+        setExpenses(expenses);
+        setCategories(categories);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError("Failed to load data");
+        setLoading(false);
+      });
+  }, [uid]);
 
-    const savedCategories = localStorage.getItem("spendwise-categories");
-    if (savedCategories) {
-      setCategories(JSON.parse(savedCategories));
-    }
-  }, []);
-
-  // Save expenses to localStorage
-  useEffect(() => {
-    if (expenses.length >= 0) {
-      localStorage.setItem("spendwise-expenses", JSON.stringify(expenses));
-    }
-  }, [expenses]);
-
-  const addExpense = () => {
+  const handleAddExpense = async () => {
     if (!selectedCategory || !amount) {
       toast({
         title: "Please select a category and enter an amount",
@@ -58,25 +63,40 @@ export const DailyLog = () => {
       });
       return;
     }
-
-    const newExpense: Expense = {
-      id: Date.now().toString(),
+    if (!uid) return;
+    const newExpense = {
       date,
       category: selectedCategory,
       amount: parseFloat(amount),
       note: note.trim(),
     };
-
-    setExpenses([newExpense, ...expenses]);
-    setSelectedCategory("");
-    setAmount("");
-    setNote("");
-    
-    toast({
-      title: "Expense logged! 💸",
-      description: `₾${amount} spent on ${selectedCategory}`,
-    });
+    try {
+      await addExpense(uid, newExpense);
+      setExpenses([{ id: "pending", ...newExpense }, ...expenses]); // Optimistic update
+      setSelectedCategory("");
+      setAmount("");
+      setNote("");
+      toast({
+        title: "Expense logged! 💸",
+        description: `₾${amount} spent on ${selectedCategory}`,
+      });
+      // Reload from Firestore to get real id
+      const updated = await getExpenses(uid);
+      setExpenses(updated);
+    } catch (err) {
+      toast({
+        title: "Failed to add expense",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (loading) {
+    return <div className="text-center text-gray-500 py-8">Loading...</div>;
+  }
+  if (error) {
+    return <div className="text-center text-red-500 py-8">{error}</div>;
+  }
 
   const todaysExpenses = expenses.filter(expense => expense.date === date);
   const todaysTotal = todaysExpenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -137,7 +157,7 @@ export const DailyLog = () => {
             rows={2}
           />
 
-          <Button onClick={addExpense} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+          <Button onClick={handleAddExpense} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
             <PlusCircle size={16} className="mr-2" />
             Add Expense
           </Button>
