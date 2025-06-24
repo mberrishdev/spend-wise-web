@@ -14,17 +14,20 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
-
-const tabs = [
-  { id: "budget", label: "Budget", icon: Calendar, path: "/dashboard/budget" },
-  { id: "log", label: "Log", icon: PlusCircle, path: "/dashboard/log" },
-  { id: "summary", label: "Summary", icon: BarChart3, path: "/dashboard/summary" },
-  { id: "settings", label: "Settings", icon: SettingsIcon, path: "/dashboard/settings" },
-];
+import { useTranslation } from "react-i18next";
 
 const DashboardLayout = () => {
   const { signOut, user } = useAuth();
   const location = useLocation();
+  const { t } = useTranslation();
+
+  const tabs = [
+    { id: "budget", label: t("budgetPlanner.budget"), icon: Calendar, path: "/dashboard/budget" },
+    { id: "log", label: t("dailyLog.log"), icon: PlusCircle, path: "/dashboard/log" },
+    { id: "summary", label: t("summary.summary"), icon: BarChart3, path: "/dashboard/summary" },
+    { id: "settings", label: t("settings.settings"), icon: SettingsIcon, path: "/dashboard/settings" },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       {/* Header */}
@@ -52,17 +55,17 @@ const DashboardLayout = () => {
               💰 SpendWise
             </h1>
             <p className="text-sm text-gray-600 text-center mt-1">
-              Your mindful spending companion
+              {t('app.subtitle')}
             </p>
           </div>
           <button
             onClick={signOut}
             className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-500 hover:text-red-600 px-2 py-1 rounded transition"
-            title="Log out"
+            title={t('app.logout')}
           >
             <LogOut size={18} />
             <span className="hidden sm:inline text-xs font-medium">
-              Log out
+              {t('app.logout')}
             </span>
           </button>
         </div>

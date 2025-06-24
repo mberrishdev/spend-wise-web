@@ -9,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import { getExpenses, addExpense, getCategories } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useTranslation } from "react-i18next";
 
 interface Expense {
   id: string;
@@ -36,6 +37,7 @@ export const DailyLog = () => {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   // Load data from Firestore
   useEffect(() => {
@@ -52,15 +54,15 @@ export const DailyLog = () => {
         setLoading(false);
       })
       .catch((err) => {
-        setError("Failed to load data");
+        setError(t('dailyLog.failed_to_load_data'));
         setLoading(false);
       });
-  }, [uid]);
+  }, [uid, t]);
 
   const handleAddExpense = async () => {
     if (!selectedCategory || !amount) {
       toast({
-        title: "Please select a category and enter an amount",
+        title: t('dailyLog.select_category_and_amount'),
         variant: "destructive",
       });
       return;
@@ -79,22 +81,22 @@ export const DailyLog = () => {
       setAmount("");
       setNote("");
       toast({
-        title: "Expense logged! 💸",
-        description: `${currency}${amount} spent on ${selectedCategory}`,
+        title: t('dailyLog.expense_logged'),
+        description: t('dailyLog.spent_on', { currency, amount, selectedCategory }),
       });
       // Reload from Firestore to get real id
       const updated = await getExpenses(uid);
       setExpenses(updated);
     } catch (err) {
       toast({
-        title: "Failed to add expense",
+        title: t('dailyLog.failed_to_add_expense'),
         variant: "destructive",
       });
     }
   };
 
   if (loading) {
-    return <div className="text-center text-gray-500 py-8">Loading...</div>;
+    return <div className="text-center text-gray-500 py-8">{t('loading')}</div>;
   }
   if (error) {
     return <div className="text-center text-red-500 py-8">{error}</div>;
@@ -109,10 +111,10 @@ export const DailyLog = () => {
       <Card className="border-blue-200 shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
-            ✍️ Log Today's Expense
+            ✍️ {t('dailyLog.log_today_expense')}
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Quick and easy expense tracking
+            {t('dailyLog.quick_and_easy')}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -128,7 +130,7 @@ export const DailyLog = () => {
 
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger>
-              <SelectValue placeholder="Select category" />
+              <SelectValue placeholder={t('dailyLog.select_category_placeholder')} />
             </SelectTrigger>
             <SelectContent>
               {categories.map((category) => (
@@ -143,7 +145,7 @@ export const DailyLog = () => {
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{currency}</span>
             <Input
               type="number"
-              placeholder="0.00"
+              placeholder={t('dailyLog.amount_placeholder')}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="pl-8 text-lg"
@@ -152,7 +154,7 @@ export const DailyLog = () => {
           </div>
 
           <Textarea
-            placeholder="What did you buy? (optional)"
+            placeholder={t('dailyLog.note_placeholder')}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             className="resize-none"
@@ -161,7 +163,7 @@ export const DailyLog = () => {
 
           <Button onClick={handleAddExpense} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
             <PlusCircle size={16} className="mr-2" />
-            Add Expense
+            {t('dailyLog.add_expense')}
           </Button>
         </CardContent>
       </Card>
@@ -170,18 +172,18 @@ export const DailyLog = () => {
       <Card className="border-gray-200">
         <CardHeader className="pb-3">
           <CardTitle className="text-base text-gray-700">
-            📅 Today's Expenses
+            📅 {t('dailyLog.todays_expenses')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between items-center mb-4">
-            <span className="text-gray-600">Total spent today:</span>
+            <span className="text-gray-600">{t('dailyLog.total_spent_today')}</span>
             <span className="text-xl font-bold text-blue-600">{currency}{todaysTotal.toFixed(2)}</span>
           </div>
 
           <div className="space-y-2">
             {todaysExpenses.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No expenses logged today</p>
+              <p className="text-gray-500 text-center py-4">{t('dailyLog.no_expenses_logged')}</p>
             ) : (
               todaysExpenses.map((expense) => (
                 <div key={expense.id} className="flex justify-between items-start p-3 bg-gray-50 rounded-lg">

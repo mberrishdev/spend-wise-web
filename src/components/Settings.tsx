@@ -5,18 +5,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { archiveCurrentPeriod, getExpenses } from "@/utils/periodManager";
-import { getMonthlyPeriod, setMonthlyPeriod, MonthlyPeriod } from "@/utils/monthlyPeriod";
+import {
+  getMonthlyPeriod,
+  setMonthlyPeriod,
+  MonthlyPeriod,
+} from "@/utils/monthlyPeriod";
 import { useAuth } from "@/hooks/useAuth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/integrations/firebase";
+import { useTranslation } from "react-i18next";
 
 const CURRENCIES = [
   { code: "GEL", symbol: "₾" },
   { code: "USD", symbol: "$" },
   { code: "EUR", symbol: "€" },
-  { code: "GBP", symbol: "£" },
-  { code: "JPY", symbol: "¥" },
-  { code: "INR", symbol: "₹" },
 ];
 
 export const Settings = () => {
@@ -27,6 +29,7 @@ export const Settings = () => {
   const [currency, setCurrency] = useState("₾");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     if (!uid) return;
@@ -64,8 +67,8 @@ export const Settings = () => {
     try {
       await setMonthlyPeriod(uid, period);
       toast({
-        title: "Monthly period saved! 🎉",
-        description: `Your budget month now runs from ${startDay}th to ${endDay}th`,
+        title: t("settings.monthly_period_saved"),
+        description: t("settings.budget_month_range", { startDay, endDay }),
       });
     } catch {
       toast({ title: "Failed to save period", variant: "destructive" });
@@ -76,9 +79,17 @@ export const Settings = () => {
     if (!uid) return;
     setCurrency(newCurrency);
     try {
-      await setDoc(doc(db, "users", uid, "profile", "main"), { currency: newCurrency }, { merge: true });
-      const currencyObj = CURRENCIES.find(c => c.symbol === newCurrency);
-      toast({ title: `Currency set to ${currencyObj?.code || newCurrency} (${newCurrency})` });
+      await setDoc(
+        doc(db, "users", uid, "profile", "main"),
+        { currency: newCurrency },
+        { merge: true }
+      );
+      const currencyObj = CURRENCIES.find((c) => c.symbol === newCurrency);
+      toast({
+        title: `Currency set to ${
+          currencyObj?.code || newCurrency
+        } (${newCurrency})`,
+      });
     } catch {
       toast({ title: "Failed to save currency", variant: "destructive" });
     }
@@ -91,7 +102,8 @@ export const Settings = () => {
       await archiveCurrentPeriod(uid, expenses);
       toast({
         title: "New period started! 🎉",
-        description: "Previous expenses have been archived and your budget is reset.",
+        description:
+          "Previous expenses have been archived and your budget is reset.",
       });
     } catch {
       toast({ title: "Failed to archive period", variant: "destructive" });
@@ -99,7 +111,11 @@ export const Settings = () => {
   };
 
   if (loading) {
-    return <div className="text-center text-gray-500 py-8">Loading...</div>;
+    return (
+      <div className="text-center text-gray-500 py-8">
+        {t("loading") || "Loading..."}
+      </div>
+    );
   }
   if (error) {
     return <div className="text-center text-red-500 py-8">{error}</div>;
@@ -110,16 +126,18 @@ export const Settings = () => {
       <Card className="border-purple-200 shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
-            ⚙️ Monthly Period Settings
+            ⚙️ {t("settings.settings")}
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Configure when your budget month starts and ends
+            {t("settings.configure_budget_month")}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-purple-50 p-4 rounded-lg space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="start-day">Budget month starts on day:</Label>
+              <Label htmlFor="start-day">
+                {t("settings.budget_month_starts")}
+              </Label>
               <Input
                 id="start-day"
                 type="number"
@@ -129,13 +147,11 @@ export const Settings = () => {
                 onChange={(e) => setStartDay(parseInt(e.target.value) || 1)}
                 className="w-20"
               />
-              <p className="text-xs text-gray-600">
-                e.g., 25 = 25th of each month
-              </p>
+              <p className="text-xs text-gray-600">{t("settings.eg_25")}</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="end-day">Budget month ends on day:</Label>
+              <Label htmlFor="end-day">{t("settings.budget_month_ends")}</Label>
               <Input
                 id="end-day"
                 type="number"
@@ -145,42 +161,62 @@ export const Settings = () => {
                 onChange={(e) => setEndDay(parseInt(e.target.value) || 1)}
                 className="w-20"
               />
-              <p className="text-xs text-gray-600">
-                e.g., 24 = 24th of next month
-              </p>
+              <p className="text-xs text-gray-600">{t("settings.eg_24")}</p>
+
+              <Button
+                onClick={savePeriod}
+                className="w-full bg-purple-600 hover:bg-purple-700"
+              >
+                {t("settings.save_period")}
+              </Button>
             </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="font-medium text-gray-700 mb-2">
+              {t("settings.current_period")}
+            </h4>
+            <p className="text-sm text-gray-600">
+              {t("settings.period_range", { startDay, endDay })}
+            </p>
+            <p className="text-xs text-gray-500 mt-2">
+              {t("settings.period_example")}
+            </p>
+          </div>
 
             <div className="space-y-2">
-              <Label htmlFor="currency">Currency:</Label>
+              <Label htmlFor="currency">{t("currency")}:</Label>
               <select
                 id="currency"
                 value={currency}
-                onChange={e => saveCurrency(e.target.value)}
+                onChange={(e) => saveCurrency(e.target.value)}
                 className="w-full p-2 border rounded"
               >
-                {CURRENCIES.map(c => (
-                  <option key={c.code} value={c.symbol}>{c.code} ({c.symbol})</option>
+                {CURRENCIES.map((c) => (
+                  <option key={c.code} value={c.symbol}>
+                    {c.code} ({c.symbol})
+                  </option>
                 ))}
               </select>
               <p className="text-xs text-gray-600">
-                This currency symbol will be used throughout the app.
+                {t("settings.currency_note")}
               </p>
             </div>
 
-            <Button onClick={savePeriod} className="w-full bg-purple-600 hover:bg-purple-700">
-              Save Monthly Period
-            </Button>
-          </div>
-
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h4 className="font-medium text-gray-700 mb-2">Current Period:</h4>
-            <p className="text-sm text-gray-600">
-              Your budget month runs from the <strong>{startDay}th</strong> of each month 
-              to the <strong>{endDay}th</strong> of the following month.
-            </p>
-            <p className="text-xs text-gray-500 mt-2">
-              Example: June 25th → July 24th
-            </p>
+            {/* Language Selector */}
+            <div className="space-y-2">
+              <Label htmlFor="language">{t("settings.language_label")}:</Label>
+              <select
+                id="language"
+                value={i18n.language}
+                onChange={(e) => i18n.changeLanguage(e.target.value)}
+                className="w-full p-2 border rounded"
+              >
+                <option value="en">English</option>
+                <option value="ka">ქართული</option>
+              </select>
+              <p className="text-xs text-gray-600">
+                {t("settings.language_note")}
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -188,23 +224,23 @@ export const Settings = () => {
       <Card className="border-orange-200 shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
-            🔄 Period Management
+            🔄 {t("settings.period_management")}
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Manually start a new budget period
+            {t("settings.manual_period_note")}
           </p>
         </CardHeader>
         <CardContent>
           <div className="bg-orange-50 p-4 rounded-lg space-y-3">
             <p className="text-sm text-gray-700">
-              This will archive all current expenses and reset your spending to ₾0 while keeping your budget categories.
+              {t("settings.archive_note")}
             </p>
-            <Button 
-              onClick={handleStartNewPeriod} 
-              variant="outline" 
+            <Button
+              onClick={handleStartNewPeriod}
+              variant="outline"
               className="w-full border-orange-300 text-orange-700 hover:bg-orange-100"
             >
-              Start New Period
+              {t("settings.start_new_period")}
             </Button>
           </div>
         </CardContent>

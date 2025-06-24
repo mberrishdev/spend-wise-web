@@ -7,6 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import { getCategories, addCategory, updateCategory, deleteCategory } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useTranslation } from "react-i18next";
 
 interface BudgetCategory {
   id: string;
@@ -26,6 +27,7 @@ export const BudgetPlanner = () => {
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editAmount, setEditAmount] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!uid) return;
@@ -37,22 +39,22 @@ export const BudgetPlanner = () => {
         setLoading(false);
       })
       .catch(() => {
-        setError("Failed to load categories");
+        setError(t('budgetPlanner.failed_to_load_categories'));
         setLoading(false);
       });
-  }, [uid]);
+  }, [uid, t]);
 
   const handleAddCategory = async () => {
     if (!newCategoryName.trim() || !newCategoryAmount) {
       toast({
-        title: "Please fill in both fields",
+        title: t('budgetPlanner.fill_in_both_fields'),
         variant: "destructive",
       });
       return;
     }
     if (parseFloat(newCategoryAmount) <= 0) {
       toast({
-        title: "Amount must be greater than 0",
+        title: t('budgetPlanner.amount_greater_than_zero'),
         variant: "destructive",
       });
       return;
@@ -65,11 +67,11 @@ export const BudgetPlanner = () => {
       });
       setNewCategoryName("");
       setNewCategoryAmount("");
-      toast({ title: "Category added successfully! 🎉" });
+      toast({ title: t('budgetPlanner.category_added') });
       const updated = await getCategories(uid);
       setCategories(updated);
     } catch {
-      toast({ title: "Failed to add category", variant: "destructive" });
+      toast({ title: t('budgetPlanner.failed_to_add_category'), variant: "destructive" });
     }
   };
 
@@ -77,7 +79,7 @@ export const BudgetPlanner = () => {
     if (!uid) return;
     if (field === "plannedAmount" && (typeof value === "number" ? value <= 0 : parseFloat(value) <= 0)) {
       toast({
-        title: "Amount must be greater than 0",
+        title: t('budgetPlanner.amount_greater_than_zero'),
         variant: "destructive",
       });
       return;
@@ -87,7 +89,7 @@ export const BudgetPlanner = () => {
       const updated = await getCategories(uid);
       setCategories(updated);
     } catch {
-      toast({ title: "Failed to update category", variant: "destructive" });
+      toast({ title: t('budgetPlanner.failed_to_update_category'), variant: "destructive" });
     }
   };
 
@@ -95,18 +97,18 @@ export const BudgetPlanner = () => {
     if (!uid) return;
     try {
       await deleteCategory(uid, id);
-      toast({ title: "Category deleted" });
+      toast({ title: t('budgetPlanner.category_deleted') });
       const updated = await getCategories(uid);
       setCategories(updated);
     } catch {
-      toast({ title: "Failed to delete category", variant: "destructive" });
+      toast({ title: t('budgetPlanner.failed_to_delete_category'), variant: "destructive" });
     }
   };
 
   const totalPlanned = categories.reduce((sum, cat) => sum + cat.plannedAmount, 0);
 
   if (loading) {
-    return <div className="text-center text-gray-500 py-8">Loading...</div>;
+    return <div className="text-center text-gray-500 py-8">{t('loading')}</div>;
   }
   if (error) {
     return <div className="text-center text-red-500 py-8">{error}</div>;
@@ -117,10 +119,10 @@ export const BudgetPlanner = () => {
       <Card className="border-green-200 shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
-            📊 Monthly Budget Plan
+            📊 {t('budgetPlanner.monthly_budget_plan')}
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Set your spending goals for each category
+            {t('budgetPlanner.set_goals')}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -128,15 +130,15 @@ export const BudgetPlanner = () => {
           {categories.length === 0 && (
             <div className="flex flex-col items-center justify-center gap-2 py-6">
               <span className="text-3xl">🗂️</span>
-              <div className="text-gray-600 text-base text-center">No categories yet. <br />Create your first budget category below!</div>
+              <div className="text-gray-600 text-base text-center">{t('budgetPlanner.no_categories')}</div>
             </div>
           )}
           {/* Add new category */}
           <div className="bg-green-50 p-4 rounded-lg space-y-3">
-            <h3 className="font-medium text-gray-700">Add New Category</h3>
+            <h3 className="font-medium text-gray-700">{t('budgetPlanner.add_new_category')}</h3>
             <div className="flex gap-2">
               <Input
-                placeholder="Category name"
+                placeholder={t('budgetPlanner.category_name')}
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
                 className="flex-1"
@@ -179,7 +181,7 @@ export const BudgetPlanner = () => {
                       <Button
                         onClick={async () => {
                           if (!editName.trim() || !editAmount || parseFloat(editAmount) <= 0) {
-                            toast({ title: "Please enter a valid name and amount", variant: "destructive" });
+                            toast({ title: t('budgetPlanner.enter_valid_name_and_amount'), variant: "destructive" });
                             return;
                           }
                           await handleUpdateCategory(category.id, "name", editName.trim());
@@ -188,7 +190,7 @@ export const BudgetPlanner = () => {
                         }}
                         size="sm"
                         className="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100"
-                        title="Save"
+                        title={t('save')}
                       >
                         <Check size={16} />
                       </Button>
@@ -197,7 +199,7 @@ export const BudgetPlanner = () => {
                         size="sm"
                         variant="ghost"
                         className="text-gray-400 hover:text-red-500"
-                        title="Cancel"
+                        title={t('cancel')}
                       >
                         <X size={16} />
                       </Button>
@@ -229,7 +231,7 @@ export const BudgetPlanner = () => {
                         size="sm"
                         variant="ghost"
                         className="text-blue-500 hover:text-blue-700"
-                        title="Edit"
+                        title={t('edit')}
                       >
                         <Pencil size={16} />
                       </Button>
@@ -238,7 +240,7 @@ export const BudgetPlanner = () => {
                         variant="ghost"
                         size="sm"
                         className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        title="Delete"
+                        title={t('delete')}
                       >
                         <Trash2 size={16} />
                       </Button>
@@ -252,7 +254,7 @@ export const BudgetPlanner = () => {
           {/* Total */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex justify-between items-center">
-              <span className="font-medium text-gray-700">Total Monthly Budget:</span>
+              <span className="font-medium text-gray-700">{t('budgetPlanner.total_monthly_budget')}</span>
               <span className="text-xl font-bold text-green-600">{currency}{totalPlanned.toFixed(2)}</span>
             </div>
           </div>

@@ -11,6 +11,7 @@ import {
 import { getExpenses, getCategories } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useTranslation } from "react-i18next";
 
 interface Expense {
   id: string;
@@ -44,6 +45,7 @@ export const Summary = () => {
   const [period, setPeriod] = useState<MonthlyPeriod | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!uid) return;
@@ -57,13 +59,13 @@ export const Summary = () => {
         setLoading(false);
       })
       .catch(() => {
-        setError("Failed to load summary data");
+        setError(t('summary.failed_to_load_summary_data'));
         setLoading(false);
       });
-  }, [uid]);
+  }, [uid, t]);
 
   if (loading || !period || !categories || !expenses) {
-    return <div className="text-center text-gray-500 py-8">Loading...</div>;
+    return <div className="text-center text-gray-500 py-8">{t('loading')}</div>;
   }
   if (error) {
     return <div className="text-center text-red-500 py-8">{error}</div>;
@@ -131,7 +133,7 @@ export const Summary = () => {
       <Card className="border-purple-200 shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
-            📈 Period Overview
+            📈 {t('summary.period_overview')}
           </CardTitle>
           <p className="text-sm text-gray-600">{formatPeriodRange(period)}</p>
         </CardHeader>
@@ -142,7 +144,7 @@ export const Summary = () => {
                 {currency}
                 {totalActual.toFixed(2)}
               </div>
-              <div className="text-sm text-gray-600">Spent</div>
+              <div className="text-sm text-gray-600">{t('summary.spent')}</div>
             </div>
             <div className="text-center">
               <div
@@ -154,7 +156,7 @@ export const Summary = () => {
                 {Math.abs(totalRemaining).toFixed(2)}
               </div>
               <div className="text-sm text-gray-600">
-                {totalRemaining >= 0 ? "Remaining" : "Over Budget"}
+                {totalRemaining >= 0 ? t('summary.remaining') : t('summary.over_budget')}
               </div>
             </div>
           </div>
@@ -180,14 +182,14 @@ export const Summary = () => {
             {totalPlanned > 0
               ? `${((totalActual / totalPlanned) * 100).toFixed(1)}%`
               : "0%"}{" "}
-            of budget used
+            {t('summary.of_budget_used')}
           </div>
         </CardContent>
       </Card>
 
       {/* Category Breakdown */}
       <div className="space-y-3">
-        <h3 className="font-medium text-gray-700">📊 By Category</h3>
+        <h3 className="font-medium text-gray-700">📊 {t('summary.by_category')}</h3>
 
         {categorySummaries.map((summary) => (
           <Card key={summary.category} className="border-gray-200">
@@ -207,7 +209,7 @@ export const Summary = () => {
                     {summary.actual.toFixed(2)}
                   </div>
                   <div className="text-sm text-gray-500">
-                    of {currency}
+                    {t('summary.of')} {currency}
                     {summary.planned.toFixed(2)}
                   </div>
                 </div>
@@ -217,7 +219,7 @@ export const Summary = () => {
 
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">
-                  {summary.percentage.toFixed(1)}% used
+                  {summary.percentage.toFixed(1)}% {t('summary.used')}
                 </span>
                 <span
                   className={`font-medium ${
@@ -225,10 +227,10 @@ export const Summary = () => {
                   }`}
                 >
                   {summary.remaining >= 0
-                    ? currency + summary.remaining.toFixed(2) + " left"
+                    ? currency + summary.remaining.toFixed(2) + ` ${t('summary.left')}`
                     : currency +
                       Math.abs(summary.remaining).toFixed(2) +
-                      " over"}
+                      ` ${t('summary.over')}`}
                 </span>
               </div>
             </CardContent>
@@ -238,9 +240,9 @@ export const Summary = () => {
         {categorySummaries.length === 0 && (
           <Card className="border-gray-200">
             <CardContent className="p-6 text-center text-gray-500">
-              No budget categories set up yet.
+              {t('summary.no_categories')}
               <br />
-              Go to the Budget tab to get started! 🎯
+              {t('summary.go_to_budget_tab')}
             </CardContent>
           </Card>
         )}
