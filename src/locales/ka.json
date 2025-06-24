@@ -29,14 +29,17 @@
     "quick_and_easy": "ხარჯების სწრაფი და მარტივი აღრიცხვა",
     "select_category_placeholder": "აირჩიეთ კატეგორია",
     "amount_placeholder": "0.00",
-    "note_placeholder": "რა იყიდეთ? (არასავალდებულო)",
+    "note_placeholder": "რისთვის იყო? (არასავალდებულო)",
     "add_expense": "ხარჯის დამატება",
     "todays_expenses": "დღევანდელი ხარჯები",
     "total_spent_today": "დღეს დახარჯული თანხა:",
     "no_expenses_logged": "დღეს ხარჯი არ არის დამატებული",
     "no_categories": "ჯერ არ გაქვთ კატეგორიები დამატებული.",
-    "go_to_budget_tab": "გადადით ბიუჯეტის ტაბზე კატეგორიის დასამატებლად.",
-    "go_to_budget_button": "გადადით ბიუჯეტზე"
+    "go_to_budget_tab": "გადადით ბიუჯეტის ტაბზე კატეგორიის დასაწყებად.",
+    "go_to_budget_button": "გადადით ბიუჯეტზე",
+    "expense_deleted": "ხარჯი წაიშალა.",
+    "expense_updated": "ხარჯი განახლდა.",
+    "note_placeholder": "რისთვის იყო? (არასავალდებულო)"
   },
   "summary": {
     "summary": "შეჯამება",

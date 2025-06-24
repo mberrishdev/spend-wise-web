@@ -4,9 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, Calendar } from "lucide-react";
+import { PlusCircle, Calendar, Pencil, Trash2, Check, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { getExpenses, addExpense, getCategories } from "@/utils/periodManager";
+import { getExpenses, addExpense, getCategories, deleteExpense, updateExpense } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useTranslation } from "react-i18next";
@@ -40,6 +40,10 @@ export const DailyLog = () => {
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editAmount, setEditAmount] = useState("");
+  const [editNote, setEditNote] = useState("");
+  const [editCategory, setEditCategory] = useState("");
 
   // Load data from Firestore
   useEffect(() => {
@@ -95,6 +99,39 @@ export const DailyLog = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleDeleteExpense = async (expenseId: string) => {
+    if (!uid) return;
+    await deleteExpense(uid, expenseId);
+    setExpenses(expenses.filter(e => e.id !== expenseId));
+    toast({ title: t('dailyLog.expense_deleted') });
+  };
+
+  const startEdit = (expense: Expense) => {
+    setEditingId(expense.id);
+    setEditAmount(expense.amount.toString());
+    setEditNote(expense.note || "");
+    setEditCategory(expense.category);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditAmount("");
+    setEditNote("");
+    setEditCategory("");
+  };
+
+  const saveEdit = async (expense: Expense) => {
+    if (!uid) return;
+    await updateExpense(uid, expense.id, {
+      amount: parseFloat(editAmount),
+      note: editNote,
+      category: editCategory,
+    });
+    setExpenses(expenses.map(e => e.id === expense.id ? { ...e, amount: parseFloat(editAmount), note: editNote, category: editCategory } : e));
+    setEditingId(null);
+    toast({ title: t('dailyLog.expense_updated') });
   };
 
   if (loading) {
@@ -209,16 +246,55 @@ export const DailyLog = () => {
               <p className="text-gray-500 dark:text-gray-400 text-center py-4">{t('dailyLog.no_expenses_logged')}</p>
             ) : (
               todaysExpenses.map((expense) => (
-                <div key={expense.id} className="flex justify-between items-start p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-800 dark:text-gray-100">{expense.category}</div>
-                    {expense.note && (
-                      <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">{expense.note}</div>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <div className="font-medium text-gray-800 dark:text-gray-100">{currency}{expense.amount.toFixed(2)}</div>
-                  </div>
+                <div key={expense.id} className="flex justify-between items-start p-3 bg-gray-50 dark:bg-gray-800 rounded-lg gap-2">
+                  {editingId === expense.id ? (
+                    <>
+                      <div className="flex-1 flex flex-col gap-1">
+                        <select
+                          className="w-full p-1 rounded border dark:bg-gray-900 dark:text-gray-100"
+                          value={editCategory}
+                          onChange={e => setEditCategory(e.target.value)}
+                        >
+                          {categories.map(c => (
+                            <option key={c.id} value={c.name}>{c.name}</option>
+                          ))}
+                        </select>
+                        <input
+                          type="number"
+                          className="w-full p-1 rounded border dark:bg-gray-900 dark:text-gray-100"
+                          value={editAmount}
+                          onChange={e => setEditAmount(e.target.value)}
+                        />
+                        <input
+                          type="text"
+                          className="w-full p-1 rounded border dark:bg-gray-900 dark:text-gray-100"
+                          value={editNote}
+                          onChange={e => setEditNote(e.target.value)}
+                          placeholder={t('dailyLog.note_placeholder')}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1 items-end">
+                        <button onClick={() => saveEdit(expense)} className="p-1 rounded bg-green-600 text-white hover:bg-green-700"><Check size={16} /></button>
+                        <button onClick={cancelEdit} className="p-1 rounded bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-600"><X size={16} /></button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-800 dark:text-gray-100">{expense.category}</div>
+                        {expense.note && (
+                          <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">{expense.note}</div>
+                        )}
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <div className="font-medium text-gray-800 dark:text-gray-100">{currency}{expense.amount.toFixed(2)}</div>
+                        <div className="flex gap-1 mt-1">
+                          <button onClick={() => startEdit(expense)} className="p-1 rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800"><Pencil size={16} /></button>
+                          <button onClick={() => handleDeleteExpense(expense.id)} className="p-1 rounded bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800"><Trash2 size={16} /></button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))
             )}

@@ -29,14 +29,16 @@
     "quick_and_easy": "Quick and easy expense tracking",
     "select_category_placeholder": "Select category",
     "amount_placeholder": "0.00",
-    "note_placeholder": "What did you buy? (optional)",
+    "note_placeholder": "What was it for? (optional)",
     "add_expense": "Add Expense",
     "todays_expenses": "Today's Expenses",
     "total_spent_today": "Total spent today:",
     "no_expenses_logged": "No expenses logged today",
     "no_categories": "No categories yet. Please add a budget category first!",
     "go_to_budget_tab": "Go to the Budget tab to add your first category.",
-    "go_to_budget_button": "Go to Budget"
+    "go_to_budget_button": "Go to Budget",
+    "expense_deleted": "Expense deleted.",
+    "expense_updated": "Expense updated."
   },
   "summary": {
     "summary": "Summary",

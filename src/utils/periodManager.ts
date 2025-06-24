@@ -97,3 +97,8 @@ export async function archiveCurrentPeriod(uid: string, expenses: Expense[]): Pr
   const col = collection(db, 'users', uid, 'archive');
   await addDoc(col, archivedPeriod);
 }
+
+export async function updateExpense(uid: string, expenseId: string, data: Partial<Expense>): Promise<void> {
+  const ref = doc(db, 'users', uid, 'dailyLogs', expenseId);
+  await updateDoc(ref, data);
+}
