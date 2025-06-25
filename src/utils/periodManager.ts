@@ -6,6 +6,7 @@ interface Expense {
   id: string;
   date: string;
   category: string;
+  categoryId?: string;
   amount: number;
   note: string;
 }

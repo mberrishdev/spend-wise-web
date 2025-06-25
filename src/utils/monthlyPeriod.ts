@@ -62,6 +62,7 @@ export const isDateInCurrentPeriod = (
   period: MonthlyPeriod
 ): boolean => {
   const { start, end } = getCurrentPeriodRange(period);
+  date.setHours(0, 0, 0, 0);
   return date >= start && date <= end;
 };
 

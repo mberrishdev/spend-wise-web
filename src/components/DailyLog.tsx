@@ -78,6 +78,7 @@ export const DailyLog = () => {
     const newExpense = {
       date,
       category: selectedCategory,
+      categoryId: categories.find(c => c.name === selectedCategory)?.id,
       amount: parseFloat(amount),
       note: note.trim(),
     };
