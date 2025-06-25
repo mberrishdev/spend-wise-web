@@ -31,12 +31,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error("Google sign-in failed:", error);
+    }
   };
+  
 
   const signOut = async () => {
-    await fbSignOut(auth);
+    try {
+      await fbSignOut(auth);
+    } catch (error) {
+      console.error("Sign-out failed:", error);
+    }
   };
 
   return (

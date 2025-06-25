@@ -14,6 +14,10 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+      },
       manifest: {
         name: 'SpendWise',
         short_name: 'SpendWise',
