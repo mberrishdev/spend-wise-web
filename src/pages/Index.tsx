@@ -15,11 +15,34 @@ import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { User } from "firebase/auth";
+
+const getGreeting = (t: ReturnType<typeof useTranslation>["t"], user: User | null) => {
+  const hour = new Date().getHours();
+  let greetingKey = 'good_morning';
+  if (hour < 5) greetingKey = 'good_night';
+  else if (hour < 12) greetingKey = 'good_morning';
+  else if (hour < 18) greetingKey = 'good_afternoon';
+  else greetingKey = 'good_evening';
+  const name = user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || t('friend', 'friend');
+  return t('greeting_name', { greeting: t(greetingKey), name });
+};
 
 const DashboardLayout = () => {
   const { signOut, user } = useAuth();
   const location = useLocation();
   const { t } = useTranslation();
+
+  const [greeting, setGreeting] = useState(() => getGreeting(t, user));
+
+  useEffect(() => {
+    setGreeting(getGreeting(t, user));
+    if (!user) return;
+    const interval = setInterval(() => {
+      setGreeting(getGreeting(t, user));
+    }, 30 * 60 * 1000); // 30 minutes
+    return () => clearInterval(interval);
+  }, [t, user]);
 
   const tabs = [
     { id: "budget", label: t("budgetPlanner.budget"), icon: Calendar, path: "/dashboard/budget" },
@@ -54,16 +77,7 @@ const DashboardLayout = () => {
             {user && (
               <div className="text-center mt-1">
                 <span className="text-base font-medium text-gray-700 dark:text-gray-100">
-                  {(() => {
-                    const hour = new Date().getHours();
-                    let greetingKey = 'good_morning';
-                    if (hour < 5) greetingKey = 'good_night';
-                    else if (hour < 12) greetingKey = 'good_morning';
-                    else if (hour < 18) greetingKey = 'good_afternoon';
-                    else greetingKey = 'good_evening';
-                    const name = user.displayName?.split(' ')[0] || user.email?.split('@')[0] || t('friend', 'friend');
-                    return t('greeting_name', { greeting: t(greetingKey), name });
-                  })()}
+                  {greeting}
                 </span>
               </div>
             )}

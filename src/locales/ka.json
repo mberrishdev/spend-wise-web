@@ -134,7 +134,7 @@
   },
   "greeting_name": "{{greeting}}, {{name}}!",
   "good_morning": "დილა მშვიდობისა",
-  "good_afternoon": "საღამო მშვიდობისა",
+  "good_afternoon": "შუადღე მშვიდობისა",
   "good_evening": "საღამო მშვიდობისა",
   "good_night": "ღამე მშვიდობისა",
   "friend": "მეგობარო"
