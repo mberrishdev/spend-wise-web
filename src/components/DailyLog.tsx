@@ -44,6 +44,7 @@ export const DailyLog = () => {
   const [editAmount, setEditAmount] = useState("");
   const [editNote, setEditNote] = useState("");
   const [editCategory, setEditCategory] = useState("");
+  const [editDate, setEditDate] = useState("");
 
   // Load data from Firestore
   useEffect(() => {
@@ -113,6 +114,7 @@ export const DailyLog = () => {
     setEditAmount(expense.amount.toString());
     setEditNote(expense.note || "");
     setEditCategory(expense.category);
+    setEditDate(expense.date);
   };
 
   const cancelEdit = () => {
@@ -120,6 +122,7 @@ export const DailyLog = () => {
     setEditAmount("");
     setEditNote("");
     setEditCategory("");
+    setEditDate("");
   };
 
   const saveEdit = async (expense: Expense) => {
@@ -128,8 +131,9 @@ export const DailyLog = () => {
       amount: parseFloat(editAmount),
       note: editNote,
       category: editCategory,
+      date: editDate,
     });
-    setExpenses(expenses.map(e => e.id === expense.id ? { ...e, amount: parseFloat(editAmount), note: editNote, category: editCategory } : e));
+    setExpenses(expenses.map(e => e.id === expense.id ? { ...e, amount: parseFloat(editAmount), note: editNote, category: editCategory, date: editDate } : e));
     setEditingId(null);
     toast({ title: t('dailyLog.expense_updated') });
   };
@@ -253,6 +257,12 @@ export const DailyLog = () => {
                   {editingId === expense.id ? (
                     <>
                       <div className="flex-1 flex flex-col gap-1">
+                        <input
+                          type="date"
+                          className="w-full p-1 rounded border dark:bg-gray-900 dark:text-gray-100 mb-1"
+                          value={editDate}
+                          onChange={e => setEditDate(e.target.value)}
+                        />
                         <select
                           className="w-full p-1 rounded border dark:bg-gray-900 dark:text-gray-100"
                           value={editCategory}
@@ -322,7 +332,12 @@ export const DailyLog = () => {
                   {editingId === expense.id ? (
                     <>
                       <div className="flex-1 flex flex-col gap-1">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 mb-1">{new Date(expense.date).toLocaleDateString()}</span>
+                        <input
+                          type="date"
+                          className="w-full p-1 rounded border dark:bg-gray-900 dark:text-gray-100 mb-1"
+                          value={editDate}
+                          onChange={e => setEditDate(e.target.value)}
+                        />
                         <select
                           className="w-full p-1 rounded border dark:bg-gray-900 dark:text-gray-100"
                           value={editCategory}

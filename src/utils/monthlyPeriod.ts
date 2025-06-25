@@ -39,7 +39,15 @@ export const getCurrentPeriodRange = (
   if (currentDay >= startDay) {
     // We're in the current period
     periodStart = new Date(currentYear, currentMonth, startDay, 0, 0, 0, 0);
-    periodEnd = new Date(currentYear, currentMonth + 1, endDay, 23, 59, 59, 999);
+    periodEnd = new Date(
+      currentYear,
+      currentMonth + 1,
+      endDay,
+      23,
+      59,
+      59,
+      999
+    );
   } else {
     // We're still in the previous period
     periodStart = new Date(currentYear, currentMonth - 1, startDay, 0, 0, 0, 0);

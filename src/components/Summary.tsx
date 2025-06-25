@@ -75,6 +75,7 @@ export const Summary = () => {
   // Get current period's expenses using custom monthly period
   const currentPeriodExpenses = expenses.filter((expense) => {
     const expenseDate = new Date(expense.date);
+
     return isDateInCurrentPeriod(expenseDate, period);
   });
 
@@ -193,6 +194,7 @@ export const Summary = () => {
         <h3 className="font-medium text-gray-700 dark:text-gray-100">📊 {t('summary.by_category')}</h3>
 
         {categorySummaries.map((summary) => {
+          
           // Find the category object to get its color
           const cat = categories.find(c => c.name === summary.category);
           const color = cat?.color || '#60a5fa';
