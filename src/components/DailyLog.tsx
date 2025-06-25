@@ -145,7 +145,7 @@ export const DailyLog = () => {
   if (categories.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-12">
-        <div className="max-w-md w-full">
+        <div className="max-w-lg w-full">
           <div className="bg-yellow-50 dark:bg-gray-900 border border-yellow-200 dark:border-gray-800 rounded-lg p-6 flex flex-col items-center gap-3 shadow-sm">
             <span className="text-4xl">🗂️</span>
             <div className="text-lg font-medium text-gray-700 dark:text-gray-100 text-center">{t('dailyLog.no_categories')}</div>

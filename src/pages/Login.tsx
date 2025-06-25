@@ -57,7 +57,7 @@ const Login: React.FC = () => {
           </radialGradient>
         </defs>
       </svg>
-      <div className="relative w-full max-w-md mx-auto rounded-3xl shadow-2xl bg-white/60 dark:bg-gray-900/90 backdrop-blur-lg border border-white/40 dark:border-gray-800 p-8 flex flex-col items-center gap-8 z-10">
+      <div className="relative w-full max-w-lg mx-auto rounded-3xl shadow-2xl bg-white/60 dark:bg-gray-900/90 backdrop-blur-lg border border-white/40 dark:border-gray-800 p-8 flex flex-col items-center gap-8 z-10">
         <div className="flex flex-col items-center gap-2 w-full">
           <a href="/">
             <img

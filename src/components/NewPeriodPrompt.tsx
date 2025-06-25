@@ -29,7 +29,7 @@ export const NewPeriodPrompt = ({ onClose }: NewPeriodPromptProps) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md border-purple-200 shadow-lg">
+      <Card className="w-full max-w-lg border-purple-200 shadow-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-lg text-gray-800 flex items-center justify-center gap-2">
             🗓️ New Budget Period Detected

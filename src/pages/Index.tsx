@@ -32,8 +32,8 @@ const DashboardLayout = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
       {/* Header */}
       <div className="bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm border-b border-green-100 dark:border-gray-800 sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-2 sm:px-4 py-3 sm:py-4 relative flex items-center justify-center">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2">
+        <div className="max-w-lg mx-auto px-2 sm:px-4 py-3 sm:py-4 relative flex items-center justify-center">
+          <div className="absolute left-2 top-1/2 -translate-y-1/2">
             {user && (
               <Avatar>
                 <AvatarImage
@@ -82,13 +82,13 @@ const DashboardLayout = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-md mx-auto px-4 py-6">
+      <div className="max-w-lg mx-auto px-4 py-6">
         <Outlet />
       </div>
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/95 backdrop-blur-sm border-t border-green-100 dark:border-gray-800">
-        <div className="max-w-md mx-auto px-4">
+        <div className="max-w-lg mx-auto px-4">
           <div className="flex justify-around py-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
