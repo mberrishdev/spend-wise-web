@@ -23,6 +23,16 @@ const CURRENCIES = [
   { code: "EUR", symbol: "€" },
 ];
 
+// Generate a secure API key
+const generateApiKey = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < 32; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
 export const Settings = () => {
   const { user } = useAuth();
   const uid = user?.uid;
@@ -34,6 +44,9 @@ export const Settings = () => {
   const [saving, setSaving] = useState(false);
   const [periodError, setPeriodError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [apiKey, setApiKey] = useState<string>("");
+  const [apiKeyLoading, setApiKeyLoading] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
   const { t, i18n } = useTranslation();
   const initialPeriod = useRef({ startDay: 25, endDay: 24 });
   const initialCurrency = useRef("₾");
@@ -59,6 +72,7 @@ export const Settings = () => {
           const data = profileSnap.data();
           setCurrency(data.currency || "₾");
           initialCurrency.current = data.currency || "₾";
+          setApiKey(data.apiKey || "");
           if (data.language && data.language !== i18n.language) {
             i18n.changeLanguage(data.language);
           }
@@ -154,6 +168,39 @@ export const Settings = () => {
     }
   };
 
+  const generateNewApiKey = async () => {
+    if (!uid) return;
+    setApiKeyLoading(true);
+    try {
+      const newApiKey = generateApiKey();
+      await setDoc(
+        doc(db, "users", uid, "profile", "main"),
+        { apiKey: newApiKey },
+        { merge: true }
+      );
+      setApiKey(newApiKey);
+      setShowApiKey(true);
+      toast({
+        title: "API Key Generated",
+        description: "New API key has been created and saved",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to generate API key",
+        variant: "destructive",
+      });
+    }
+    setApiKeyLoading(false);
+  };
+
+  const copyApiKey = () => {
+    navigator.clipboard.writeText(apiKey);
+    toast({
+      title: "API Key Copied",
+      description: "API key has been copied to clipboard",
+    });
+  };
+
   const handleStartNewPeriod = async () => {
     if (!uid) return;
     setSaving(true);
@@ -179,6 +226,69 @@ export const Settings = () => {
 
   return (
     <div className="space-y-8">
+      {/* API Key Section */}
+      <Card className="border-blue-200 shadow-sm mb-6 bg-white dark:bg-gray-900">
+        <CardHeader className="pb-2 px-4 pt-4">
+          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
+            🔑 API Key
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 px-4 pb-4">
+          <div className="bg-blue-50 dark:bg-gray-800 p-4 rounded-lg">
+            <p className="text-sm text-gray-700 dark:text-gray-100 mb-3">
+              Generate an API key to connect your bank transactions to Spend Wise. 
+              Use this key in your API requests to automatically import transactions.
+            </p>
+            
+            {apiKey ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Input
+                    type={showApiKey ? "text" : "password"}
+                    value={apiKey}
+                    readOnly
+                    className="font-mono text-sm"
+                  />
+                  <Button
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    variant="outline"
+                    size="sm"
+                  >
+                    {showApiKey ? "Hide" : "Show"}
+                  </Button>
+                  <Button
+                    onClick={copyApiKey}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Copy
+                  </Button>
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">
+                  <p>🔒 Keep this key secure. Anyone with this key can import transactions to your account.</p>
+                  <p>📝 Use this key in the <code>X-API-Key</code> header when making API requests.</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                No API key generated yet.
+              </p>
+            )}
+            
+            <Button
+              onClick={generateNewApiKey}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={apiKeyLoading}
+            >
+              {apiKeyLoading ? (
+                <span className="animate-spin mr-2">⏳</span>
+              ) : null}
+              {apiKey ? "Generate New API Key" : "Generate API Key"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Budget Period Section */}
       <Card className="border-purple-200 shadow-sm mb-6 bg-white dark:bg-gray-900">
         <CardHeader className="pb-2 px-4 pt-4">

@@ -10,6 +10,7 @@ import {
   BarChart3,
   Settings as SettingsIcon,
   LogOut,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -48,6 +49,7 @@ const DashboardLayout = () => {
     { id: "budget", label: t("budgetPlanner.budget"), icon: Calendar, path: "/dashboard/budget" },
     { id: "log", label: t("dailyLog.log"), icon: PlusCircle, path: "/dashboard/log" },
     { id: "summary", label: t("summary.summary"), icon: BarChart3, path: "/dashboard/summary" },
+    // { id: "uncategorized", label: t("app.transactions"), icon: FileText, path: "/dashboard/uncategorized-transactions" },
     { id: "settings", label: t("settings.settings"), icon: SettingsIcon, path: "/dashboard/settings" },
   ];
 

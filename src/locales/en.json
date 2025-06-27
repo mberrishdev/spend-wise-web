@@ -123,7 +123,8 @@
   "offline": "You are offline. Some features may not work.",
   "app": {
     "subtitle": "Your mindful spending companion",
-    "logout": "Log out"
+    "logout": "Log out",
+    "transactions": "Transactions"
   },
   "landing": {
     "get_started": "Get Started Free",
@@ -134,5 +135,28 @@
   "good_afternoon": "Good afternoon",
   "good_evening": "Good evening",
   "good_night": "Good night",
-  "friend": "friend"
+  "friend": "friend",
+  "uncategorized": {
+    "title": "Uncategorized Transactions",
+    "need_categorization": "transaction(s) need categorization",
+    "refresh": "Refresh",
+    "description": "These transactions were imported from your bank but haven't been categorized yet. Please categorize them to keep your budget organized.",
+    "id": "ID",
+    "imported": "Imported",
+    "category": "Category",
+    "choose_category": "Category...",
+    "uncategorize": "Uncategorize",
+    "categorized": "Transaction categorized",
+    "categorized_as": "Categorized as {{category}}",
+    "uncategorized": "Transaction set as uncategorized",
+    "visible_again": "Transaction is now uncategorized and visible again.",
+    "error_categorizing": "Error categorizing transaction",
+    "error_uncategorizing": "Error deleting transaction",
+    "last_import": "Last import",
+    "all_categorized": "All transactions categorized!",
+    "all_categorized_desc": "You have no uncategorized transactions. Great job keeping your finances organized!",
+    "no_categories": "No categories found",
+    "no_categories_desc": "You need to create budget categories first before you can categorize transactions.",
+    "create_categories": "Create Categories"
+  }
 }
