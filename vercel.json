@@ -2,10 +2,10 @@
   "version": 2,
   "builds": [
     { "src": "package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } },
-    { "src": "api/**/*.js", "use": "@vercel/node" }
+    { "src": "api/index.cjs", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1.js" },
+    { "src": "/api/(.*)", "dest": "/api/index.cjs" },
     { "src": "/(.*)", "dest": "/dist/index.html" }
   ]
 }
