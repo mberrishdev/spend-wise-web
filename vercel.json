@@ -15,6 +15,8 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "/api/(.*)", "dest": "/api/health.js" },
+    { "src": "/api/(.*)", "dest": "/api/test.js" },
     { "src": "/(.*)", "dest": "/dist/index.html" }
   ]
 }
