@@ -1,5 +1,7 @@
 // Load environment variables from .env.local
-require("dotenv").config({ path: ".env.local" });
+if (process.env.VERCEL !== "1") {
+  require("dotenv").config({ path: ".env.local" });
+}
 
 const express = require("express");
 const cors = require("cors");
