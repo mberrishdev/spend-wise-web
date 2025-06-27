@@ -18,15 +18,21 @@ import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { User } from "firebase/auth";
 
-const getGreeting = (t: ReturnType<typeof useTranslation>["t"], user: User | null) => {
+const getGreeting = (
+  t: ReturnType<typeof useTranslation>["t"],
+  user: User | null
+) => {
   const hour = new Date().getHours();
-  let greetingKey = 'good_morning';
-  if (hour < 5) greetingKey = 'good_night';
-  else if (hour < 12) greetingKey = 'good_morning';
-  else if (hour < 18) greetingKey = 'good_afternoon';
-  else greetingKey = 'good_evening';
-  const name = user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || t('friend', 'friend');
-  return t('greeting_name', { greeting: t(greetingKey), name });
+  let greetingKey = "good_morning";
+  if (hour < 5) greetingKey = "good_night";
+  else if (hour < 12) greetingKey = "good_morning";
+  else if (hour < 18) greetingKey = "good_afternoon";
+  else greetingKey = "good_evening";
+  const name =
+    user?.displayName?.split(" ")[0] ||
+    user?.email?.split("@")[0] ||
+    t("friend", "friend");
+  return t("greeting_name", { greeting: t(greetingKey), name });
 };
 
 const DashboardLayout = () => {
@@ -46,11 +52,36 @@ const DashboardLayout = () => {
   }, [t, user]);
 
   const tabs = [
-    { id: "budget", label: t("budgetPlanner.budget"), icon: Calendar, path: "/dashboard/budget" },
-    { id: "log", label: t("dailyLog.log"), icon: PlusCircle, path: "/dashboard/log" },
-    { id: "summary", label: t("summary.summary"), icon: BarChart3, path: "/dashboard/summary" },
-    // { id: "uncategorized", label: t("app.transactions"), icon: FileText, path: "/dashboard/uncategorized-transactions" },
-    { id: "settings", label: t("settings.settings"), icon: SettingsIcon, path: "/dashboard/settings" },
+    {
+      id: "budget",
+      label: t("budgetPlanner.budget"),
+      icon: Calendar,
+      path: "/dashboard/budget",
+    },
+    {
+      id: "log",
+      label: t("dailyLog.log"),
+      icon: PlusCircle,
+      path: "/dashboard/log",
+    },
+    {
+      id: "summary",
+      label: t("summary.summary"),
+      icon: BarChart3,
+      path: "/dashboard/summary",
+    },
+    {
+      id: "uncategorized",
+      label: t("app.transactions"),
+      icon: FileText,
+      path: "/dashboard/uncategorized-transactions",
+    },
+    {
+      id: "settings",
+      label: t("settings.settings"),
+      icon: SettingsIcon,
+      path: "/dashboard/settings",
+    },
   ];
 
   return (
@@ -87,11 +118,11 @@ const DashboardLayout = () => {
           <button
             onClick={signOut}
             className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 px-2 py-1 rounded transition"
-            title={t('app.logout')}
+            title={t("app.logout")}
           >
             <LogOut size={18} />
             <span className="hidden sm:inline text-xs font-medium">
-              {t('app.logout')}
+              {t("app.logout")}
             </span>
           </button>
         </div>

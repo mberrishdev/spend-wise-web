@@ -73,7 +73,11 @@ export const UncategorizedTransactions = () => {
     setLoading(true);
     try {
       const expensesRef = collection(db, "users", uid, "expenses");
-      const q = query(expensesRef, where("category", "==", ""));
+      const q = query(
+        expensesRef,
+        where("category", "==", "")
+        // where("status", "!=", "deleted")
+      );
       const querySnapshot = await getDocs(q);
 
       const uncategorizedTransactions: UncategorizedTransaction[] = [];
@@ -86,7 +90,13 @@ export const UncategorizedTransactions = () => {
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
       );
 
-      setTransactions(uncategorizedTransactions);
+      const filteredTransactions = uncategorizedTransactions.filter(
+        (tx) => tx.status !== "deleted"
+      );
+
+      setTransactions(filteredTransactions);
+
+      //setTransactions(uncategorizedTransactions);
     } catch (error) {
       console.error("Error loading uncategorized transactions:", error);
       toast({
@@ -156,30 +166,13 @@ export const UncategorizedTransactions = () => {
       await updateDoc(transactionRef, {
         category: "",
         categoryId: "",
-        status: "uncategorized",
+        status: "deleted",
         categorizedAt: null,
       });
-      // Reload uncategorized transactions so it reappears
-      await loadUncategorizedTransactions();
-      toast({
-        title: t(
-          "uncategorized.uncategorized",
-          "Transaction set as uncategorized"
-        ),
-        description: t(
-          "uncategorized.visible_again",
-          "Transaction is now uncategorized and visible again."
-        ),
-      });
+      // Remove from local state so it does not reappear
+      setTransactions((prev) => prev.filter((t) => t.id !== transactionId));
     } catch (error) {
       console.error("Error deleting transaction:", error);
-      toast({
-        title: t(
-          "uncategorized.error_uncategorizing",
-          "Error deleting transaction"
-        ),
-        variant: "destructive",
-      });
     }
     setCategorizing(null);
   };
