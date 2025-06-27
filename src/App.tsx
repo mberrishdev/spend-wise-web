@@ -12,6 +12,7 @@ import { BudgetPlanner } from "@/components/BudgetPlanner";
 import { DailyLog } from "@/components/DailyLog";
 import { Summary } from "@/components/Summary";
 import { Settings } from "@/components/Settings";
+import { UncategorizedTransactions } from "@/components/UncategorizedTransactions";
 import NotFound from "./pages/NotFound";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -58,6 +59,7 @@ const App = () => (
                     <Route path="log" element={<DailyLog />} />
                     <Route path="summary" element={<Summary />} />
                     <Route path="settings" element={<Settings />} />
+                    <Route path="uncategorized-transactions" element={<UncategorizedTransactions />} />
                     <Route index element={<Navigate to="log" replace />} />
                   </Route>
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
