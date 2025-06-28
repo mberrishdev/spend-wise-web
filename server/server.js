@@ -294,7 +294,7 @@ app.post("/api/transactions", validateApiKey, async (req, res) => {
         };
 
         // Save to Firebase
-        await setDoc(transactionRef, expense);
+        await transactionRef.set(expense);
 
         console.log(
           `  Saved transaction: ${transaction.id} - ${transaction.description}`
