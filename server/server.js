@@ -6,25 +6,32 @@ if (process.env.VERCEL !== "1") {
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
-const { initializeApp } = require("firebase/app");
-const {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-} = require("firebase/firestore");
+const admin = require("firebase-admin");
 const firebaseConfig = require("./firebase-config");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
+// Initialize Firebase Admin SDK
+let db;
+if (admin.apps.length === 0) {
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: firebaseConfig.projectId,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      }),
+    });
+    console.log("✅ Firebase Admin SDK initialized successfully");
+  } catch (error) {
+    console.error("❌ Failed to initialize Firebase Admin SDK:", error.message);
+    console.error("Error details:", error);
+    process.exit(1);
+  }
+}
+db = admin.firestore();
+console.log("✅ Firestore database initialized");
 
 // Middleware
 app.use(cors());
@@ -36,67 +43,162 @@ const validateApiKey = async (req, res, next) => {
   const apiKey = req.headers["x-api-key"];
 
   if (!apiKey) {
+    console.log("API key validation failed: No X-API-Key header provided");
     return res.status(401).json({
       success: false,
       message: "API key is required. Please provide X-API-Key header.",
     });
   }
 
+  console.log(`Validating API key: ${apiKey.substring(0, 8)}...`);
+
   try {
-    // Find user by API key - try multiple possible paths
-    const usersRef = collection(db, "users");
+    console.log(
+      "No user found with direct queries, checking subcollections..."
+    );
+    try {
+      // Verify we're connected to the right project
+      console.log(
+        "🔍 Connected to Firebase project:",
+        firebaseConfig.projectId
+      );
+      console.log("🔍 Collection path:", await db.listCollections());
 
-    // Try different possible paths for the API key
-    const queries = [
-      query(usersRef, where("profile.main.apiKey", "==", apiKey)),
-      query(usersRef, where("profile.apiKey", "==", apiKey)),
-      query(usersRef, where("apiKey", "==", apiKey)),
-    ];
+      // Use listDocuments() instead of get() to get all user document references
+      const userRefs = await db.collection("users").listDocuments();
+      console.log(
+        `🔍 Found ${userRefs.length} users in database using listDocuments()`
+      );
 
-    let userDoc = null;
+      // Log details about each user found
+      userRefs.forEach((ref, index) => {
+        console.log(`  User ${index + 1}: ID=${ref.id}`);
+      });
 
-    for (let i = 0; i < queries.length; i++) {
+      // Try to get more users with different approaches
+      console.log("🔍 Trying alternative approaches to get all users...");
+
+      // Approach 1: Try with a limit
       try {
-        const querySnapshot = await getDocs(queries[i]);
-
-        if (!querySnapshot.empty) {
-          userDoc = querySnapshot.docs[0];
-          break;
-        }
-      } catch (queryError) {
-        console.log(`Query ${i + 1} failed:`, queryError.message);
-      }
-    }
-
-    // If no user found with direct queries, try checking subcollections
-    if (!userDoc) {
-      try {
-        const allUsersSnapshot = await getDocs(usersRef);
-
-        // Check each user's profile subcollection
-        for (const userDocSnapshot of allUsersSnapshot.docs) {
-          const userId = userDocSnapshot.id;
-
-          // Check profile subcollection
-          const profileRef = collection(db, "users", userId, "profile");
-          const profileSnapshot = await getDocs(profileRef);
-
-          profileSnapshot.forEach((profileDoc) => {
-            const profileData = profileDoc.data();
-
-            if (profileData.apiKey === apiKey) {
-              userDoc = userDocSnapshot;
-            }
-          });
-
-          if (userDoc) break;
-        }
+        const limitedSnapshot = await db.collection("users").limit(20).get();
+        console.log(
+          `🔍 With limit(20): Found ${limitedSnapshot.docs.length} users`
+        );
       } catch (error) {
-        console.log("Error checking subcollections:", error.message);
+        console.log("❌ Error with limit query:", error.message);
       }
+
+      // Approach 2: Try with orderBy
+      try {
+        const orderedSnapshot = await db
+          .collection("users")
+          .orderBy("__name__")
+          .get();
+        console.log(
+          `🔍 With orderBy: Found ${orderedSnapshot.docs.length} users`
+        );
+      } catch (error) {
+        console.log("❌ Error with orderBy query:", error.message);
+      }
+
+      // Approach 3: Check if we can access the first user's data
+      if (userRefs.length > 0) {
+        const firstUserRef = userRefs[0];
+        try {
+          const firstUserDoc = await firstUserRef.get();
+          const userData = firstUserDoc.data();
+          console.log("🔍 First user data keys:", Object.keys(userData || {}));
+          console.log(
+            "🔍 First user data preview:",
+            JSON.stringify(userData, null, 2).substring(0, 200) + "..."
+          );
+        } catch (error) {
+          console.log("❌ Error accessing first user data:", error.message);
+        }
+      }
+
+      // Approach 4: Try to get users one by one to see if there's a pagination issue
+      console.log("🔍 Checking if there are more users with pagination...");
+      try {
+        let allUsers = [];
+        let lastDoc = null;
+        let batchCount = 0;
+
+        do {
+          let query = db.collection("users");
+          if (lastDoc) {
+            query = query.startAfter(lastDoc);
+          }
+          query = query.limit(10);
+
+          const batch = await query.get();
+          console.log(
+            `🔍 Batch ${batchCount + 1}: Found ${batch.docs.length} users`
+          );
+
+          if (batch.docs.length > 0) {
+            allUsers = allUsers.concat(batch.docs);
+            lastDoc = batch.docs[batch.docs.length - 1];
+            batchCount++;
+          } else {
+            break;
+          }
+        } while (batch.docs.length === 10);
+
+        console.log(`🔍 Total users found with pagination: ${allUsers.length}`);
+      } catch (error) {
+        console.log("❌ Error with pagination approach:", error.message);
+      }
+
+      // Check each user's profile subcollection using listDocuments approach
+      for (const userRef of userRefs) {
+        const userId = userRef.id;
+        console.log(`🔍 Checking user: ${userId}`);
+
+        // Check profile subcollection
+        const profileRef = userRef.collection("profile");
+        const profileSnapshot = await profileRef.get();
+        console.log(
+          `🔍 User ${userId} has ${profileSnapshot.docs.length} profile documents`
+        );
+
+        for (const profileDoc of profileSnapshot.docs) {
+          const profileData = profileDoc.data();
+          const foundApiKey = profileData.apiKey;
+          console.log(
+            `Checking user ${userId}, profile ${profileDoc.id}:`,
+            foundApiKey ? `${foundApiKey.substring(0, 8)}...` : "null"
+          );
+          console.log(
+            `  Comparing: Request API key "${apiKey.substring(
+              0,
+              8
+            )}..." vs Found API key "${
+              foundApiKey ? foundApiKey.substring(0, 8) + "..." : "null"
+            }"`
+          );
+
+          if (foundApiKey === apiKey) {
+            userDoc = await userRef.get();
+            foundPath = `users/${userId}/profile/${profileDoc.id}.apiKey`;
+            console.log(
+              `✅ Found user ${userId} with API key in subcollection`
+            );
+            break;
+          }
+        }
+
+        if (userDoc) break;
+      }
+    } catch (error) {
+      console.log("❌ Error checking subcollections:", error.message);
+      console.log("Error details:", error);
     }
 
     if (!userDoc) {
+      console.log(
+        `❌ No user found with API key: ${apiKey.substring(0, 8)}...`
+      );
       return res.status(401).json({
         success: false,
         message: "Invalid API key",
@@ -106,44 +208,17 @@ const validateApiKey = async (req, res, next) => {
     // Get the user document
     req.userId = userDoc.id;
     req.userData = userDoc.data();
+    console.log(`✅ API key validation successful for user: ${userDoc.id}`);
 
     next();
   } catch (error) {
-    console.error("Error validating API key:", error);
+    console.error("❌ Error validating API key:", error);
     return res.status(500).json({
       success: false,
       message: "Error validating API key",
     });
   }
 };
-
-// POST endpoint that logs something
-app.post("/api/log", (req, res) => {
-  const { message, data, timestamp } = req.body;
-
-  // Log the received data
-  console.log("=== POST /api/log received ===");
-  console.log("Timestamp:", timestamp || new Date().toISOString());
-  console.log("Message:", message);
-  console.log("Data:", data);
-  console.log("Request body:", req.body);
-  console.log("================================");
-
-  // You can also log to a file or database here
-  // For example, you could write to a log file:
-  // fs.appendFileSync('server.log', `${new Date().toISOString()} - ${JSON.stringify(req.body)}\n`);
-
-  res.status(200).json({
-    success: true,
-    message: "Data logged successfully",
-    receivedAt: new Date().toISOString(),
-    loggedData: {
-      message,
-      data,
-      timestamp: timestamp || new Date().toISOString(),
-    },
-  });
-});
 
 // POST endpoint for transactions with API key validation
 app.post("/api/transactions", validateApiKey, async (req, res) => {
@@ -190,16 +265,14 @@ app.post("/api/transactions", validateApiKey, async (req, res) => {
     for (const transaction of transactions) {
       try {
         // Check if transaction already exists
-        const transactionRef = doc(
-          db,
-          "users",
-          userId,
-          "expenses",
-          transaction.id
-        );
-        const transactionDoc = await getDoc(transactionRef);
+        const transactionRef = db
+          .collection("users")
+          .doc(userId)
+          .collection("expenses")
+          .doc(transaction.id);
+        const transactionDoc = await transactionRef.get();
 
-        if (transactionDoc.exists()) {
+        if (transactionDoc.exists) {
           console.log(`  Skipping existing transaction: ${transaction.id}`);
           skippedCount++;
           skippedTransactions.push(transaction.id);
@@ -278,7 +351,6 @@ app.get("/", (req, res) => {
   res.json({
     message: "Spend Wise Express.js Server",
     endpoints: {
-      "POST /api/log": "Log data to server console",
       "POST /api/transactions":
         "Import transactions (requires X-API-Key header)",
       "GET /api/health": "Health check endpoint",
@@ -290,9 +362,6 @@ app.get("/", (req, res) => {
 if (process.env.NODE_ENV !== "production" || process.env.VERCEL !== "1") {
   app.listen(PORT, () => {
     console.log(`🚀 Express.js server running on port ${PORT}`);
-    console.log(
-      `📝 POST endpoint available at: http://localhost:${PORT}/api/log`
-    );
     console.log(
       `💳 Transactions endpoint at: http://localhost:${PORT}/api/transactions`
     );
