@@ -11,7 +11,7 @@ import {
   where,
   getDocs,
   updateDoc,
-  deleteDoc,
+  deleteField,
 } from "firebase/firestore";
 import { db } from "@/integrations/firebase";
 import { useTranslation } from "react-i18next";
@@ -122,16 +122,19 @@ export const UncategorizedTransactions = () => {
       const transactionRef = doc(db, "users", uid, "expenses", transactionId);
 
       await updateDoc(transactionRef, {
-        date: "",
-        description: "",
-        amount: 0,
-        note: "",
-        currency: "",
-        entryType: "",
+        id: transactionId,
+        status: "categorized",
+        date: deleteField(),
+        description: deleteField(),
+        amount: deleteField(),
+        note: deleteField(),
+        currency: deleteField(),
+        entryType: deleteField(),
         category: selectedCategory.name,
         categoryId: selectedCategory.id,
-        status: "categorized",
-        categorizedAt: new Date().toISOString(),
+        categorizedAt: deleteField(),
+        importedAt: deleteField(),
+        source: deleteField(),
       });
 
       // Add to dailyLogs as an expense
@@ -172,17 +175,19 @@ export const UncategorizedTransactions = () => {
     try {
       const transactionRef = doc(db, "users", uid, "expenses", transactionId);
       await updateDoc(transactionRef, {
-        date: "",
-        description: "",
-        amount: 0,
-        note: "",
-        currency: "",
-        entryType: "",
-        category: "",
-        categoryId: "",
+        id: transactionId,
         status: "deleted",
-        categorizedAt: null,
-        source: "",
+        date: deleteField(),
+        description: deleteField(),
+        amount: deleteField(),
+        note: deleteField(),
+        currency: deleteField(),
+        entryType: deleteField(),
+        category: deleteField(),
+        categoryId: deleteField(),
+        categorizedAt: deleteField(),
+        importedAt: deleteField(),
+        source: deleteField(),
       });
       // Remove from local state so it does not reappear
       setTransactions((prev) => prev.filter((t) => t.id !== transactionId));
