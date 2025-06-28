@@ -226,16 +226,16 @@ export const Analytics = () => {
     if (totals.percentageUsed > 90) {
       insights.push({
         type: "negative",
-        title: "Budget Warning",
-        description: "You're approaching your budget limit. Consider reviewing your spending.",
+        title: t('analytics.budget_warning'),
+        description: t('analytics.budget_warning_desc'),
         icon: <AlertTriangle className="w-5 h-5" />,
-        action: "Review Spending",
+        action: t('analytics.review_spending'),
       });
     } else if (totals.percentageUsed < 50) {
       insights.push({
         type: "positive",
-        title: "Great Progress",
-        description: "You're well within your budget. Keep up the good work!",
+        title: t('analytics.great_progress'),
+        description: t('analytics.great_progress_desc'),
         icon: <CheckCircle className="w-5 h-5" />,
       });
     }
@@ -245,16 +245,16 @@ export const Analytics = () => {
       if (summary.percentage > 100) {
         insights.push({
           type: "negative",
-          title: `${summary.category} Over Budget`,
-          description: "This category has exceeded its planned amount.",
+          title: t('analytics.over_budget_category', { category: summary.category }),
+          description: t('analytics.over_budget_desc'),
           icon: <TrendingUp className="w-5 h-5" />,
-          action: "Adjust Budget",
+          action: t('analytics.adjust_budget'),
         });
       }
     });
 
     return insights.slice(0, 3); // Limit to 3 insights
-  }, [totals, categorySummaries]);
+  }, [totals, categorySummaries, t]);
 
   const formatCurrency = (amount: number) => {
     return `${currency}${showAmounts ? amount.toFixed(2) : '***'}`;
@@ -278,7 +278,7 @@ export const Analytics = () => {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-500 dark:text-gray-400">{t('loading')}</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('analytics.loading')}</p>
         </div>
       </div>
     );
@@ -296,7 +296,7 @@ export const Analytics = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-            📊 Financial Analytics
+            📊 {t('analytics.title')}
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {formatPeriodRange(period)}
@@ -309,7 +309,7 @@ export const Analytics = () => {
           className="flex items-center gap-2"
         >
           {showAmounts ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          {showAmounts ? "Hide Amounts" : "Show Amounts"}
+          {showAmounts ? t('analytics.hide_amounts') : t('analytics.show_amounts')}
         </Button>
       </div>
 
@@ -319,7 +319,7 @@ export const Analytics = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Spent</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.total_spent')}</p>
                 <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {formatCurrency(totals.actual)}
                 </p>
@@ -335,7 +335,7 @@ export const Analytics = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Budget Remaining</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.budget_remaining')}</p>
                 <p className={`text-2xl font-bold ${getStatusColor(totals.percentageUsed)}`}>
                   {formatCurrency(Math.abs(totals.remaining))}
                 </p>
@@ -351,7 +351,7 @@ export const Analytics = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Budget Used</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.budget_used')}</p>
                 <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {totals.percentageUsed.toFixed(1)}%
                 </p>
@@ -367,7 +367,7 @@ export const Analytics = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Transactions</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.transactions')}</p>
                 <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                   {currentPeriodExpenses.length}
                 </p>
@@ -385,7 +385,7 @@ export const Analytics = () => {
         <Card className="border-yellow-200 dark:border-yellow-800">
           <CardHeader>
             <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
-              💡 Smart Insights
+              💡 {t('analytics.smart_insights')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -441,19 +441,19 @@ export const Analytics = () => {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4" />
-            Overview
+            {t('analytics.overview')}
           </TabsTrigger>
           <TabsTrigger value="trends" className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
-            Trends
+            {t('analytics.trends')}
           </TabsTrigger>
           <TabsTrigger value="categories" className="flex items-center gap-2">
             <PieChartIcon className="w-4 h-4" />
-            Categories
+            {t('analytics.categories')}
           </TabsTrigger>
           <TabsTrigger value="details" className="flex items-center gap-2">
             <Activity className="w-4 h-4" />
-            Details
+            {t('analytics.details')}
           </TabsTrigger>
         </TabsList>
 
@@ -463,7 +463,7 @@ export const Analytics = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg text-gray-800 dark:text-gray-100">
-                  📈 Daily Spending
+                  📈 {t('analytics.daily_spending')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -497,7 +497,7 @@ export const Analytics = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg text-gray-800 dark:text-gray-100">
-                  🥧 Category Breakdown
+                  🥧 {t('analytics.category_breakdown')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -530,7 +530,7 @@ export const Analytics = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg text-gray-800 dark:text-gray-100">
-                📊 Spending Trends
+                📊 {t('analytics.spending_trends')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -568,7 +568,7 @@ export const Analytics = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg text-gray-800 dark:text-gray-100">
-                  📊 Category Performance
+                  📊 {t('analytics.category_performance')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -590,7 +590,7 @@ export const Analytics = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg text-gray-800 dark:text-gray-100">
-                  ⚖️ Budget vs Actual
+                  ⚖️ {t('analytics.budget_vs_actual')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -635,7 +635,7 @@ export const Analytics = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg text-gray-800 dark:text-gray-100">
-                📋 Category Details
+                📋 {t('analytics.category_details')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -655,7 +655,7 @@ export const Analytics = () => {
                               {summary.category}
                             </h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {summary.percentage.toFixed(1)}% of budget used
+                              {summary.percentage.toFixed(1)}% {t('analytics.of_budget_used')}
                             </p>
                           </div>
                         </div>
@@ -664,7 +664,7 @@ export const Analytics = () => {
                             {formatCurrency(summary.actual)}
                           </div>
                           <div className="text-sm text-gray-500">
-                            of {formatCurrency(summary.planned)}
+                            {t('of')} {formatCurrency(summary.planned)}
                           </div>
                         </div>
                       </div>
@@ -672,7 +672,7 @@ export const Analytics = () => {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600 dark:text-gray-400">
-                            Remaining:
+                            {t('analytics.remaining')}:
                           </span>
                           <span
                             className={`font-medium ${
@@ -682,7 +682,7 @@ export const Analytics = () => {
                             }`}
                           >
                             {formatCurrency(Math.abs(summary.remaining))}
-                            {summary.remaining >= 0 ? " left" : " over"}
+                            {summary.remaining >= 0 ? ` ${t('analytics.left')}` : ` ${t('analytics.over')}`}
                           </span>
                         </div>
                         

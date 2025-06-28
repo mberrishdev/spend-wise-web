@@ -181,12 +181,41 @@ export const Settings = () => {
       setApiKey(newApiKey);
       setShowApiKey(true);
       toast({
-        title: "API Key Generated",
-        description: "New API key has been created and saved",
+        title: t("settings.api_key_generated"),
+        description: t("settings.api_key_generated_desc"),
       });
     } catch (error) {
       toast({
-        title: "Failed to generate API key",
+        title: t("settings.failed_to_generate_api_key"),
+        variant: "destructive",
+      });
+    }
+    setApiKeyLoading(false);
+  };
+
+  const deleteApiKey = async () => {
+    if (!uid || !apiKey) return;
+    
+    if (!window.confirm(t("settings.delete_api_key_confirm"))) {
+      return;
+    }
+    
+    setApiKeyLoading(true);
+    try {
+      await setDoc(
+        doc(db, "users", uid, "profile", "main"),
+        { apiKey: null },
+        { merge: true }
+      );
+      setApiKey("");
+      setShowApiKey(false);
+      toast({
+        title: t("settings.api_key_deleted"),
+        description: t("settings.api_key_deleted_desc"),
+      });
+    } catch (error) {
+      toast({
+        title: t("settings.failed_to_delete_api_key"),
         variant: "destructive",
       });
     }
@@ -196,8 +225,8 @@ export const Settings = () => {
   const copyApiKey = () => {
     navigator.clipboard.writeText(apiKey);
     toast({
-      title: "API Key Copied",
-      description: "API key has been copied to clipboard",
+      title: t("settings.api_key_copied"),
+      description: t("settings.api_key_copied_desc"),
     });
   };
 
@@ -218,7 +247,7 @@ export const Settings = () => {
   // };
 
   if (loading) {
-    return <div className="text-center text-gray-500 py-8">{t("loading")}</div>;
+    return <div className="text-center text-gray-500 py-8">{t("settings.loading")}</div>;
   }
   if (error) {
     return <div className="text-center text-red-500 py-8">{error}</div>;
@@ -230,14 +259,13 @@ export const Settings = () => {
       <Card className="border-blue-200 shadow-sm mb-6 bg-white dark:bg-gray-900">
         <CardHeader className="pb-2 px-4 pt-4">
           <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
-            🔑 API Key
+            🔑 {t("settings.api_key")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 px-4 pb-4">
           <div className="bg-blue-50 dark:bg-gray-800 p-4 rounded-lg">
             <p className="text-sm text-gray-700 dark:text-gray-100 mb-3">
-              Generate an API key to connect your bank transactions to Spend Wise. 
-              Use this key in your API requests to automatically import transactions.
+              {t("settings.api_key_description")}
             </p>
             
             {apiKey ? (
@@ -254,24 +282,33 @@ export const Settings = () => {
                     variant="outline"
                     size="sm"
                   >
-                    {showApiKey ? "Hide" : "Show"}
+                    {showApiKey ? t("settings.hide") : t("settings.show")}
                   </Button>
                   <Button
                     onClick={copyApiKey}
                     variant="outline"
                     size="sm"
                   >
-                    Copy
+                    {t("settings.copy")}
+                  </Button>
+                  <Button
+                    onClick={deleteApiKey}
+                    variant="outline"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 border-red-300 hover:border-red-400"
+                    disabled={apiKeyLoading}
+                  >
+                    {t("settings.delete")}
                   </Button>
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">
-                  <p>🔒 Keep this key secure. Anyone with this key can import transactions to your account.</p>
-                  <p>📝 Use this key in the <code>X-API-Key</code> header when making API requests.</p>
+                  <p>🔒 {t("settings.api_key_security_note")}</p>
+                  <p>📝 {t("settings.api_key_usage_note")}</p>
                 </div>
               </div>
             ) : (
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                No API key generated yet.
+                {t("settings.no_api_key")}
               </p>
             )}
             
@@ -283,7 +320,7 @@ export const Settings = () => {
               {apiKeyLoading ? (
                 <span className="animate-spin mr-2">⏳</span>
               ) : null}
-              {apiKey ? "Generate New API Key" : "Generate API Key"}
+              {apiKey ? t("settings.generate_new_api_key") : t("settings.generate_api_key")}
             </Button>
           </div>
         </CardContent>

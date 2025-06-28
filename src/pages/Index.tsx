@@ -125,7 +125,7 @@ const DashboardLayout = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+        className={`bg-gradient-to-br fixed inset-y-0 left-0 z-50 w-64 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -170,9 +170,6 @@ const DashboardLayout = () => {
                 <p className="text-base font-semibold text-gray-800 dark:text-gray-100 truncate">
                   {user?.displayName || user?.email?.split("@")[0] || "User"}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
-                  {greeting}
-                </p>
               </div>
               <Button
                 variant="ghost"
@@ -183,6 +180,11 @@ const DashboardLayout = () => {
               >
                 <LogOut className="w-5 h-5" />
               </Button>
+            </div>
+            <div>
+              <p className="text-xs text-gray-900 dark:text-gray-400 truncate mt-0.5">
+                {greeting}
+              </p>
             </div>
           </div>
 
