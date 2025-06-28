@@ -1,9 +1,4 @@
 import { useEffect, useState } from "react";
-import { BudgetPlanner } from "@/components/BudgetPlanner";
-import { DailyLog } from "@/components/DailyLog";
-import { Summary } from "@/components/Summary";
-import { Settings } from "@/components/Settings";
-import { NewPeriodPrompt } from "@/components/NewPeriodPrompt";
 import {
   Calendar,
   PlusCircle,
@@ -11,12 +6,18 @@ import {
   Settings as SettingsIcon,
   LogOut,
   FileText,
+  TrendingUp,
+  Lightbulb,
+  Home,
+  Menu,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { User } from "firebase/auth";
+import { Button } from "@/components/ui/button";
 
 const getGreeting = (
   t: ReturnType<typeof useTranslation>["t"],
@@ -39,6 +40,7 @@ const DashboardLayout = () => {
   const { signOut, user } = useAuth();
   const location = useLocation();
   const { t } = useTranslation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [greeting, setGreeting] = useState(() => getGreeting(t, user));
 
@@ -51,13 +53,7 @@ const DashboardLayout = () => {
     return () => clearInterval(interval);
   }, [t, user]);
 
-  const tabs = [
-    {
-      id: "budget",
-      label: t("budgetPlanner.budget"),
-      icon: Calendar,
-      path: "/dashboard/budget",
-    },
+  const navigationItems = [
     {
       id: "log",
       label: t("dailyLog.log"),
@@ -65,14 +61,32 @@ const DashboardLayout = () => {
       path: "/dashboard/log",
     },
     {
+      id: "budget",
+      label: t("budgetPlanner.budget"),
+      icon: Calendar,
+      path: "/dashboard/budget",
+    },
+    {
+      id: "analytics",
+      label: t("analytics.analytics"),
+      icon: BarChart3,
+      path: "/dashboard/analytics",
+    },
+    {
+      id: "advisor",
+      label: t("advisor.advisor"),
+      icon: Lightbulb,
+      path: "/dashboard/advisor",
+    },
+    {
       id: "summary",
       label: t("summary.summary"),
-      icon: BarChart3,
+      icon: TrendingUp,
       path: "/dashboard/summary",
     },
     {
       id: "uncategorized",
-      label: t("app.transactions"),
+      label: t("uncategorized.title"),
       icon: FileText,
       path: "/dashboard/uncategorized-transactions",
     },
@@ -84,86 +98,237 @@ const DashboardLayout = () => {
     },
   ];
 
+  const quickActions = [
+    {
+      id: "add-expense",
+      label: t("add"),
+      icon: PlusCircle,
+      action: () => (window.location.href = "/dashboard/log"),
+    },
+    {
+      id: "view-analytics",
+      label: t("analytics.analytics"),
+      icon: BarChart3,
+      action: () => (window.location.href = "/dashboard/analytics"),
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
-      {/* Header */}
-      <div className="bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm border-b border-green-100 dark:border-gray-800 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-2 sm:px-4 py-3 sm:py-4 relative flex items-center justify-center">
-          <div className="absolute left-2 top-1/2 -translate-y-1/2">
-            {user && (
-              <Avatar>
+    <div className="flex min-h-screen h-auto bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-64 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Sidebar Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">$</span>
+              </div>
+              <span className="font-semibold text-gray-800 dark:text-gray-100">
+                SpendWise
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* User Info */}
+          <div className="p-5 border-b border-gray-200 dark:border-gray-800 rounded-xl mx-3 mt-4 mb-2 bg-gradient-to-r from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 flex flex-col items-center gap-2 shadow-sm">
+            <div className="flex items-center gap-3 w-full">
+              <Avatar className="w-12 h-12 shadow-md">
                 <AvatarImage
-                  src={user.photoURL || undefined}
-                  alt={user.displayName || user.email || "User"}
+                  src={user?.photoURL || undefined}
+                  alt={user?.displayName || user?.email || "User"}
                 />
-                <AvatarFallback>
-                  {user.displayName
+                <AvatarFallback className="text-lg">
+                  {user?.displayName
                     ? user.displayName[0]
-                    : user.email
+                    : user?.email
                     ? user.email[0]
                     : "U"}
                 </AvatarFallback>
               </Avatar>
-            )}
-          </div>
-          <div>
-            {user && (
-              <div className="text-center mt-1">
-                <span className="text-base font-medium text-gray-700 dark:text-gray-100">
+              <div className="flex-1 min-w-0">
+                <p className="text-base font-semibold text-gray-800 dark:text-gray-100 truncate">
+                  {user?.displayName || user?.email?.split("@")[0] || "User"}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                   {greeting}
-                </span>
+                </p>
               </div>
-            )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={signOut}
+                className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                title={t("app.logout")}
+              >
+                <LogOut className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
-          <button
-            onClick={signOut}
-            className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 px-2 py-1 rounded transition"
-            title={t("app.logout")}
+
+          {/* Navigation */}
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {navigationItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <NavLink
+                  key={item.id}
+                  to={item.path}
+                  onClick={() => setSidebarOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 group ${
+                      isActive
+                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200 border-r-2 border-green-500"
+                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-800 dark:hover:text-gray-100"
+                    }`
+                  }
+                >
+                  <Icon
+                    className={`w-5 h-5 ${
+                      location.pathname === item.path
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
+                    }`}
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium">{item.label}</div>
+                  </div>
+                </NavLink>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex flex-col flex-1 min-h-screen">
+        {/* Top Header */}
+        <div className="dark:bg-gray-900/90 backdrop-blur-sm border-b border-green-100 dark:border-gray-800 sticky top-0 z-30 shadow-sm">
+          <div className="flex flex-col gap-0 px-4 py-3">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSidebarOpen(true)}
+                  className="lg:hidden"
+                >
+                  <Menu className="w-5 h-5" />
+                </Button>
+                <div className="flex items-center gap-2 min-w-0">
+                  <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 truncate">
+                    {navigationItems.find(
+                      (item) => item.path === location.pathname
+                    )?.label || "Dashboard"}
+                  </h1>
+                </div>
+              </div>
+              {/* Quick Actions */}
+              <div className="flex items-center gap-2">
+                {quickActions.map((action) => {
+                  const Icon = action.icon;
+                  return (
+                    <Button
+                      key={action.id}
+                      variant="outline"
+                      size="sm"
+                      onClick={action.action}
+                      className="flex items-center gap-2"
+                    >
+                      <Icon className="w-4 h-4" />
+                      {action.label}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Page Content */}
+        <div className="flex-1 w-full max-w-5xl mx-auto px-4 py-6">
+          <Outlet />
+        </div>
+      </div>
+
+      {/* Mobile Bottom Navigation - Only for essential actions */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/95 backdrop-blur-sm border-t border-green-100 dark:border-gray-800 lg:hidden">
+        <div className="flex justify-around py-2">
+          <NavLink
+            to="/dashboard/log"
+            className={({ isActive }) =>
+              `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
+                isActive
+                  ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
+                  : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
+              }`
+            }
           >
-            <LogOut size={18} />
-            <span className="hidden sm:inline text-xs font-medium">
-              {t("app.logout")}
-            </span>
+            <PlusCircle size={20} />
+            <span className="text-xs mt-1 font-medium">Add</span>
+          </NavLink>
+
+          <NavLink
+            to="/dashboard/analytics"
+            className={({ isActive }) =>
+              `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
+                isActive
+                  ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
+                  : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
+              }`
+            }
+          >
+            <BarChart3 size={20} />
+            <span className="text-xs mt-1 font-medium">Analytics</span>
+          </NavLink>
+
+          <NavLink
+            to="/dashboard/budget"
+            className={({ isActive }) =>
+              `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
+                isActive
+                  ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
+                  : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
+              }`
+            }
+          >
+            <Calendar size={20} />
+            <span className="text-xs mt-1 font-medium">Budget</span>
+          </NavLink>
+
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
+          >
+            <Menu size={20} />
+            <span className="text-xs mt-1 font-medium">More</span>
           </button>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-lg mx-auto px-4 py-6">
-        <Outlet />
-      </div>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/95 backdrop-blur-sm border-t border-green-100 dark:border-gray-800">
-        <div className="max-w-lg mx-auto px-4">
-          <div className="flex justify-around py-2">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = location.pathname === tab.path;
-              return (
-                <NavLink
-                  key={tab.id}
-                  to={tab.path}
-                  className={({ isActive }) =>
-                    `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
-                      isActive
-                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
-                        : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
-                    }`
-                  }
-                  end
-                >
-                  <Icon size={20} />
-                  <span className="text-xs mt-1 font-medium">{tab.label}</span>
-                </NavLink>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom padding to account for fixed navigation */}
-      <div className="h-20"></div>
+      {/* Bottom padding for mobile navigation */}
+      <div className="h-16 lg:hidden"></div>
     </div>
   );
 };

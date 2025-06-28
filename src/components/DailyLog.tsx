@@ -140,8 +140,16 @@ export const DailyLog = () => {
   };
 
   if (loading) {
-    return <div className="text-center text-gray-500 py-8">{t('loading')}</div>;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-500 dark:text-gray-400">{t("loading")}</p>
+        </div>
+      </div>
+    );
   }
+  
   if (error) {
     return <div className="text-center text-red-500 py-8">{error}</div>;
   }

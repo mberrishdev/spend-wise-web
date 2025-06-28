@@ -19,7 +19,7 @@
     "total_monthly_budget": "Total Monthly Budget:"
   },
   "dailyLog": {
-    "dailyLog": "Log",
+    "log": "Log",
     "failed_to_load_data": "Failed to load data",
     "select_category_and_amount": "Please select a category and enter an amount",
     "expense_logged": "Expense logged! 💸",
@@ -93,6 +93,71 @@
     "theme_system": "System",
     "theme_light": "Light",
     "theme_dark": "Dark"
+  },
+  "analytics": {
+    "analytics": "Analytics"
+  },
+  "advisor": {
+    "advisor": "Financial Advisor",
+    "title": "Your Personal Financial Advisor",
+    "subtitle": "AI-powered insights and recommendations",
+    "failed_to_load": "Failed to load financial data",
+    "ai_title": "AI-Powered Financial Insights",
+    "coming_soon_title": "Coming Soon",
+    "coming_soon_desc": "Advanced AI features are being developed to provide personalized financial advice and insights.",
+    "smart_insights": "Smart Insights",
+    "goal_planning": "Goal Planning",
+    "trend_analysis": "Trend Analysis",
+    "personalized": "Personalized",
+    "health_score": "Health Score",
+    "budget_health": "Budget Health",
+    "savings_rate": "Savings Rate",
+    "transactions": "Transactions",
+    "avg_daily": "Avg Daily",
+    "day": "day",
+    "total_spent": "Total Spent",
+    "budget_remaining": "Budget Remaining",
+    "budget_used": "Budget Used",
+    "daily_average": "Daily Average",
+    "personalized_advice": "Personalized Advice",
+    "great_job": "Great Job!",
+    "great_job_desc": "You're managing your finances well. Keep up the good work!",
+    "quick_actions": "Quick Actions",
+    "budget_calculator": "Budget Calculator",
+    "savings_goals": "Savings Goals",
+    "debt_tracker": "Debt Tracker",
+    "impact": "Impact",
+    "advice": {
+      "budget-warning": {
+        "title": "Budget Warning",
+        "desc": "You're spending more than planned in several categories.",
+        "action": "Review your spending and adjust your budget categories.",
+        "impact": "High"
+      },
+      "budget-opportunity": {
+        "title": "Budget Opportunity",
+        "desc": "You have room to increase savings or invest in other areas.",
+        "action": "Consider increasing your savings goals or investing the surplus.",
+        "impact": "Medium"
+      },
+      "savings-low": {
+        "title": "Low Savings Rate",
+        "desc": "Your savings rate is below recommended levels.",
+        "action": "Try to save at least 20% of your income each month.",
+        "impact": "High"
+      },
+      "emergency-fund": {
+        "title": "Emergency Fund",
+        "desc": "Consider building an emergency fund for unexpected expenses.",
+        "action": "Aim to save 3-6 months of living expenses.",
+        "impact": "Medium"
+      }
+    },
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    }
   },
   "add": "Add",
   "edit": "Edit",
