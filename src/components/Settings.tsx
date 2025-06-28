@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { archiveCurrentPeriod, getExpenses } from "@/utils/periodManager";
+import {  getExpenses } from "@/utils/periodManager";
 import {
   getMonthlyPeriod,
   setMonthlyPeriod,
@@ -201,21 +201,21 @@ export const Settings = () => {
     });
   };
 
-  const handleStartNewPeriod = async () => {
-    if (!uid) return;
-    setSaving(true);
-    try {
-      const expenses = await getExpenses(uid);
-      await archiveCurrentPeriod(uid, expenses);
-      toast({
-        title: t("settings.new_period_started"),
-        description: t("settings.archived_and_reset"),
-      });
-    } catch {
-      toast({ title: t("settings.failed_to_archive"), variant: "destructive" });
-    }
-    setSaving(false);
-  };
+  // const handleStartNewPeriod = async () => {
+  //   if (!uid) return;
+  //   setSaving(true);
+  //   try {
+  //     const expenses = await getExpenses(uid);
+  //     await archiveCurrentPeriod(uid, expenses);
+  //     toast({
+  //       title: t("settings.new_period_started"),
+  //       description: t("settings.archived_and_reset"),
+  //     });
+  //   } catch {
+  //     toast({ title: t("settings.failed_to_archive"), variant: "destructive" });
+  //   }
+  //   setSaving(false);
+  // };
 
   if (loading) {
     return <div className="text-center text-gray-500 py-8">{t("loading")}</div>;
@@ -501,7 +501,7 @@ export const Settings = () => {
       </Card>
 
       {/* Actions Section */}
-      <Card className="border-orange-200 shadow-sm bg-white dark:bg-gray-900">
+      {/* <Card className="border-orange-200 shadow-sm bg-white dark:bg-gray-900">
         <CardHeader className="pb-2 px-4 pt-4">
           <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
             🔄 {t("settings.period_management")}
@@ -523,7 +523,7 @@ export const Settings = () => {
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 };

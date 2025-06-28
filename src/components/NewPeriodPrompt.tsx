@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { archiveCurrentPeriod } from "@/utils/periodManager";
+// import { archiveCurrentPeriod } from "@/utils/periodManager";
 import { formatPeriodRange, MonthlyPeriod } from "@/utils/monthlyPeriod";
 
 interface NewPeriodPromptProps {
