@@ -120,12 +120,20 @@ export const UncategorizedTransactions = () => {
       }
       const transaction = transactions.find((t) => t.id === transactionId);
       const transactionRef = doc(db, "users", uid, "expenses", transactionId);
+
       await updateDoc(transactionRef, {
+        date: "",
+        description: "",
+        amount: 0,
+        note: "",
+        currency: "",
+        entryType: "",
         category: selectedCategory.name,
         categoryId: selectedCategory.id,
         status: "categorized",
         categorizedAt: new Date().toISOString(),
       });
+
       // Add to dailyLogs as an expense
       if (transaction) {
         await addExpense(uid, {
@@ -164,10 +172,17 @@ export const UncategorizedTransactions = () => {
     try {
       const transactionRef = doc(db, "users", uid, "expenses", transactionId);
       await updateDoc(transactionRef, {
+        date: "",
+        description: "",
+        amount: 0,
+        note: "",
+        currency: "",
+        entryType: "",
         category: "",
         categoryId: "",
         status: "deleted",
         categorizedAt: null,
+        source: "",
       });
       // Remove from local state so it does not reappear
       setTransactions((prev) => prev.filter((t) => t.id !== transactionId));
