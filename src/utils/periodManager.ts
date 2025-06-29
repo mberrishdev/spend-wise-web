@@ -10,6 +10,7 @@ import {
   where,
   deleteDoc,
   updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 
 interface Expense {
@@ -110,24 +111,33 @@ export async function getArchivedPeriods(
   );
 }
 
-// export async function archiveCurrentPeriod(uid: string, expenses: Expense[]): Promise<void> {
-//   if (expenses.length === 0) return;
-//   const { start, end } = getCurrentPeriodRange();
-//   const previousPeriodStart = new Date(start);
-//   const previousPeriodEnd = new Date(end);
-//   previousPeriodStart.setMonth(previousPeriodStart.getMonth() - 1);
-//   previousPeriodEnd.setMonth(previousPeriodEnd.getMonth() - 1);
-//   const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-//   const archivedPeriod: Omit<ArchivedPeriod, 'id'> = {
-//     periodStart: previousPeriodStart.toISOString(),
-//     periodEnd: previousPeriodEnd.toISOString(),
-//     expenses,
-//     totalSpent,
-//     archivedAt: new Date().toISOString(),
-//   };
-//   const col = collection(db, 'users', uid, 'archive');
-//   await addDoc(col, archivedPeriod);
-//}
+export async function archiveCurrentPeriod(
+  uid: string, 
+  expenses: Expense[], 
+  periodStart: Date, 
+  periodEnd: Date
+): Promise<void> {
+  if (expenses.length === 0) return;
+  
+  const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const archivedPeriod: Omit<ArchivedPeriod, 'id'> = {
+    periodStart: periodStart.toISOString(),
+    periodEnd: periodEnd.toISOString(),
+    expenses,
+    totalSpent,
+    archivedAt: new Date().toISOString(),
+  };
+  const col = collection(db, 'users', uid, 'archive');
+  await addDoc(col, archivedPeriod);
+
+  // Delete all archived expenses from dailyLogs
+  const batch = writeBatch(db);
+  for (const expense of expenses) {
+    const ref = doc(db, 'users', uid, 'dailyLogs', expense.id);
+    batch.delete(ref);
+  }
+  await batch.commit();
+}
 
 export async function updateExpense(
   uid: string,

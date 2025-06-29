@@ -27,7 +27,7 @@ import {
   getMonthlyPeriod,
   MonthlyPeriod,
 } from "@/utils/monthlyPeriod";
-import { getExpenses, getCategories } from "@/utils/periodManager";
+import { getExpenses, getCategories, getArchivedPeriods } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useTranslation } from "react-i18next";
@@ -39,13 +39,18 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  Calendar,
+  Calendar as CalendarIcon,
   BarChart3,
   PieChart as PieChartIcon,
   Activity,
   Eye,
   EyeOff,
+  Archive,
 } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Expense {
   id: string;
@@ -92,6 +97,15 @@ interface CategorySpending {
   color: string;
 }
 
+interface ArchivedPeriod {
+  id: string;
+  periodStart: string;
+  periodEnd: string;
+  expenses: Expense[];
+  totalSpent: number;
+  archivedAt: string;
+}
+
 export const Analytics = () => {
   const { user } = useAuth();
   const uid = user?.uid;
@@ -102,17 +116,23 @@ export const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAmounts, setShowAmounts] = useState(true);
+  const [customPeriodStart, setCustomPeriodStart] = useState<Date | undefined>(undefined);
+  const [customPeriodEnd, setCustomPeriodEnd] = useState<Date | undefined>(undefined);
+  const [useCustomPeriod, setUseCustomPeriod] = useState(false);
+  const [archivedPeriods, setArchivedPeriods] = useState<ArchivedPeriod[]>([]);
+  const [selectedArchivedPeriod, setSelectedArchivedPeriod] = useState<ArchivedPeriod | null>(null);
   const { t } = useTranslation();
 
   useEffect(() => {
     if (!uid) return;
     setLoading(true);
     setError(null);
-    Promise.all([getExpenses(uid), getCategories(uid), getMonthlyPeriod(uid)])
-      .then(([expenses, categories, period]) => {
+    Promise.all([getExpenses(uid), getCategories(uid), getMonthlyPeriod(uid), getArchivedPeriods(uid)])
+      .then(([expenses, categories, period, archived]) => {
         setExpenses(expenses);
         setCategories(categories);
         setPeriod(period);
+        setArchivedPeriods(archived);
         setLoading(false);
       })
       .catch(() => {
@@ -124,11 +144,23 @@ export const Analytics = () => {
   // Get current period's expenses
   const currentPeriodExpenses = useMemo(() => {
     if (!period || !expenses.length) return [];
+    
+    if (selectedArchivedPeriod) {
+      return selectedArchivedPeriod.expenses;
+    }
+    
+    if (useCustomPeriod && customPeriodStart && customPeriodEnd) {
+      return expenses.filter((expense) => {
+        const expenseDate = new Date(expense.date);
+        return expenseDate >= customPeriodStart && expenseDate <= customPeriodEnd;
+      });
+    }
+    
     return expenses.filter((expense) => {
       const expenseDate = new Date(expense.date);
       return isDateInCurrentPeriod(expenseDate, period);
     });
-  }, [expenses, period]);
+  }, [expenses, period, useCustomPeriod, customPeriodStart, customPeriodEnd, selectedArchivedPeriod]);
 
   // Calculate category summaries
   const categorySummaries = useMemo(() => {
@@ -174,12 +206,25 @@ export const Analytics = () => {
 
   // Generate daily spending data for charts
   const dailySpendingData = useMemo(() => {
-    if (!currentPeriodExpenses.length || !period) return [];
+    if (!currentPeriodExpenses.length) return [];
 
     const dailyMap = new Map<string, number>();
-    const { start, end } = getCurrentPeriodRange(period);
-    const startDate = start;
-    const endDate = end;
+    let startDate: Date;
+    let endDate: Date;
+
+    if (selectedArchivedPeriod) {
+      startDate = new Date(selectedArchivedPeriod.periodStart);
+      endDate = new Date(selectedArchivedPeriod.periodEnd);
+    } else if (useCustomPeriod && customPeriodStart && customPeriodEnd) {
+      startDate = customPeriodStart;
+      endDate = customPeriodEnd;
+    } else if (period) {
+      const periodRange = getCurrentPeriodRange(period);
+      startDate = periodRange.start;
+      endDate = periodRange.end;
+    } else {
+      return [];
+    }
 
     // Initialize all days with 0
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
@@ -205,7 +250,7 @@ export const Analytics = () => {
         };
       })
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  }, [currentPeriodExpenses, period]);
+  }, [currentPeriodExpenses, period, useCustomPeriod, customPeriodStart, customPeriodEnd, selectedArchivedPeriod]);
 
   // Generate category spending data for pie chart
   const categorySpendingData = useMemo(() => {
@@ -299,18 +344,51 @@ export const Analytics = () => {
             📊 {t('analytics.title')}
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {formatPeriodRange(period)}
+            {selectedArchivedPeriod 
+              ? `${format(new Date(selectedArchivedPeriod.periodStart), 'MMM dd')} - ${format(new Date(selectedArchivedPeriod.periodEnd), 'MMM dd, yyyy')} (Archived)`
+              : useCustomPeriod && customPeriodStart && customPeriodEnd
+              ? `${format(customPeriodStart, 'MMM dd')} - ${format(customPeriodEnd, 'MMM dd, yyyy')}`
+              : formatPeriodRange(period)
+            }
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowAmounts(!showAmounts)}
-          className="flex items-center gap-2"
-        >
-          {showAmounts ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          {showAmounts ? t('analytics.hide_amounts') : t('analytics.show_amounts')}
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* Period Selection */}
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedArchivedPeriod?.id || 'current'}
+              onChange={(e) => {
+                if (e.target.value === 'current') {
+                  setSelectedArchivedPeriod(null);
+                  setUseCustomPeriod(false);
+                } else {
+                  const archived = archivedPeriods.find(p => p.id === e.target.value);
+                  setSelectedArchivedPeriod(archived || null);
+                  setUseCustomPeriod(false);
+                }
+              }}
+              className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900 dark:text-gray-100"
+            >
+              <option value="current">Current Period</option>
+              {archivedPeriods.map((archived) => (
+                <option key={archived.id} value={archived.id}>
+                  {format(new Date(archived.periodStart), 'MMM dd')} - {format(new Date(archived.periodEnd), 'MMM dd, yyyy')}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Privacy Toggle */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAmounts(!showAmounts)}
+            className="flex items-center gap-2"
+          >
+            {showAmounts ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            {showAmounts ? t('analytics.hide_amounts') : t('analytics.show_amounts')}
+          </Button>
+        </div>
       </div>
 
       {/* Key Metrics Cards */}

@@ -3,12 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import {  getExpenses } from "@/utils/periodManager";
+import { getExpenses, archiveCurrentPeriod } from "@/utils/periodManager";
 import {
   getMonthlyPeriod,
   setMonthlyPeriod,
   MonthlyPeriod,
+  getCurrentPeriodRange,
+  formatPeriodRange,
 } from "@/utils/monthlyPeriod";
 import { useAuth } from "@/hooks/useAuth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -47,6 +50,8 @@ export const Settings = () => {
   const [apiKey, setApiKey] = useState<string>("");
   const [apiKeyLoading, setApiKeyLoading] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
+  const [archiving, setArchiving] = useState(false);
+  const [showArchiveDialog, setShowArchiveDialog] = useState(false);
   const { t, i18n } = useTranslation();
   const initialPeriod = useRef({ startDay: 25, endDay: 24 });
   const initialCurrency = useRef("₾");
@@ -223,11 +228,61 @@ export const Settings = () => {
   };
 
   const copyApiKey = () => {
-    navigator.clipboard.writeText(apiKey);
-    toast({
-      title: t("settings.api_key_copied"),
-      description: t("settings.api_key_copied_desc"),
-    });
+    if (apiKey) {
+      navigator.clipboard.writeText(apiKey);
+      toast({
+        title: t("settings.api_key_copied"),
+        description: t("settings.api_key_copied_desc"),
+      });
+    }
+  };
+
+  const handleArchive = async () => {
+    if (!uid) return;
+    
+    setShowArchiveDialog(true);
+  };
+
+  const confirmArchive = async () => {
+    if (!uid) return;
+
+    setArchiving(true);
+    setShowArchiveDialog(false);
+    
+    try {
+      // Get current expenses
+      const expenses = await getExpenses(uid);
+      
+      if (expenses.length === 0) {
+        toast({
+          title: t("settings.no_data_to_archive"),
+          description: t("settings.no_data_to_archive_desc"),
+        });
+        return;
+      }
+
+      // Get current period range
+      const period = await getMonthlyPeriod(uid);
+      const { start, end } = getCurrentPeriodRange(period);
+      
+      // Archive the current period
+      await archiveCurrentPeriod(uid, expenses, start, end);
+      
+      toast({
+        title: t("settings.archive_success"),
+        description: t("settings.archive_success_desc", { 
+          period: formatPeriodRange(period),
+          count: expenses.length 
+        }),
+      });
+    } catch (error) {
+      toast({
+        title: t("settings.archive_failed"),
+        description: t("settings.archive_failed_desc"),
+        variant: "destructive",
+      });
+    }
+    setArchiving(false);
   };
 
   // const handleStartNewPeriod = async () => {
@@ -255,6 +310,40 @@ export const Settings = () => {
 
   return (
     <div className="space-y-8">
+      {/* Quick Actions Section */}
+      <Card className="border-orange-200 shadow-sm bg-white dark:bg-gray-900">
+        <CardHeader className="pb-2 px-4 pt-4 flex items-center gap-2">
+          <span className="text-2xl">⚡</span>
+          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
+            {t("settings.quick_actions", "Quick Actions")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-4 pb-4">
+          <div className="flex flex-col md:flex-row md:items-center md:gap-6 gap-3">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-orange-500 text-xl">📦</span>
+                <span className="font-medium text-gray-800 dark:text-gray-100">
+                  {t("settings.archive_current_period")}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                {t("settings.archive_note")}
+              </p>
+            </div>
+            <Button
+              onClick={handleArchive}
+              variant="outline"
+              className="border-orange-300 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 flex items-center justify-center min-w-[180px]"
+              disabled={archiving}
+            >
+              {archiving ? <span className="animate-spin mr-2">⏳</span> : null}
+              📦 {t("settings.archive_current_period")}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* API Key Section */}
       <Card className="border-blue-200 shadow-sm mb-6 bg-white dark:bg-gray-900">
         <CardHeader className="pb-2 px-4 pt-4">
@@ -537,30 +626,44 @@ export const Settings = () => {
         </CardContent>
       </Card>
 
-      {/* Actions Section */}
-      {/* <Card className="border-orange-200 shadow-sm bg-white dark:bg-gray-900">
-        <CardHeader className="pb-2 px-4 pt-4">
-          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
-            🔄 {t("settings.period_management")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="px-4 pb-4">
-          <div className="bg-orange-50 dark:bg-gray-800 p-4 rounded-lg space-y-3">
-            <p className="text-sm text-gray-700 dark:text-gray-100">
-              {t("settings.archive_note")}
-            </p>
+      {/* Archive Confirmation Dialog */}
+      <Dialog open={showArchiveDialog} onOpenChange={setShowArchiveDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              📦 {t("settings.archive_management")}
+            </DialogTitle>
+            <DialogDescription>
+              {t("settings.archive_confirm")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2">
             <Button
-              onClick={handleStartNewPeriod}
               variant="outline"
-              className="w-full border-orange-300 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 flex items-center justify-center"
-              disabled={saving}
+              onClick={() => setShowArchiveDialog(false)}
+              disabled={archiving}
             >
-              {saving ? <span className="animate-spin mr-2">⏳</span> : null}
-              {t("settings.start_new_period")}
+              {t("cancel")}
             </Button>
-          </div>
-        </CardContent>
-      </Card> */}
+            <Button
+              onClick={confirmArchive}
+              disabled={archiving}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              {archiving ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  {t("settings.loading")}
+                </>
+              ) : (
+                <>
+                  📦 {t("settings.archive_current_period")}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

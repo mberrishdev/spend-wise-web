@@ -19,6 +19,7 @@ import { DailyLog } from "@/components/DailyLog";
 import { Analytics } from "@/components/Analytics";
 import { Settings } from "@/components/Settings";
 import { UncategorizedTransactions } from "@/components/UncategorizedTransactions";
+import { Archive } from "@/components/Archive";
 import NotFound from "./pages/NotFound";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -84,6 +85,7 @@ const App = () => (
                     />
                     <Route path="analytics" element={<Analytics />} />
                     <Route path="advisor" element={<FinancialAdvisor />} />
+                    <Route path="archive" element={<Archive />} />
                     <Route index element={<Navigate to="log" replace />} />
                   </Route>
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

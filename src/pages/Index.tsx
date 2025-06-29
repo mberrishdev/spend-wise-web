@@ -11,6 +11,7 @@ import {
   Home,
   Menu,
   X,
+  Archive,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -83,6 +84,12 @@ const DashboardLayout = () => {
       label: t("summary.summary"),
       icon: TrendingUp,
       path: "/dashboard/summary",
+    },
+    {
+      id: "archive",
+      label: t("archive.title"),
+      icon: Archive,
+      path: "/dashboard/archive",
     },
     {
       id: "uncategorized",
