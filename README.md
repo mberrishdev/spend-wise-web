@@ -61,6 +61,16 @@ For TBC Bank integration, there is a Chrome extension available (private repo). 
 
 ---
 
+## 📞 Contact & Support
+
+Have questions about SpendWise or need a demo? I'd love to help!
+
+- **Email:** [mikheil.berishvili@outlook.com](mailto:mikheil.berishvili@outlook.com)
+- **GitHub Issues:** [Create an issue](https://github.com/mberrishdev/spend-wise-web/issues) for bugs or feature requests
+- **Demo Requests:** Feel free to reach out for a live demo or walkthrough
+
+---
+
 MIT License
 
 ## ❤️ Made with
