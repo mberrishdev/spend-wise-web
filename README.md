@@ -51,6 +51,16 @@ VITE_FIREBASE_MEASUREMENT_ID=your-measurement-id
 
 ---
 
+## 🌐 Related Projects
+
+- **Server API:** [spend-wise-server GitHub repo](https://github.com/mberrishdev/spend-wise-server)
+
+## 🏦 TBC Bank Chrome Extension
+
+For TBC Bank integration, there is a Chrome extension available (private repo). To request access, please contact: [mikheil.berishvili@outlook.com](mailto:mikheil.berishvili@outlook.com)
+
+---
+
 MIT License
 
 ## ❤️ Made with
