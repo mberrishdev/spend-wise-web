@@ -12,6 +12,7 @@ import {
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import React from "react";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
+import { PrivacyProvider } from "@/contexts/PrivacyContext";
 import Landing from "./pages/Landing";
 import DashboardLayout from "./pages/Index";
 import { BudgetPlanner } from "@/components/BudgetPlanner";
@@ -55,44 +56,46 @@ const App = () => (
       <ThemeProvider>
         <AuthProvider>
           <CurrencyProvider>
-            <BrowserRouter>
-              <React.Suspense fallback={null}>
-                <Routes>
-                  <Route path="/" element={<Landing />} />
-                  <Route
-                    path="/login"
-                    element={
-                      <RedirectIfAuth>
-                        <Login />
-                      </RedirectIfAuth>
-                    }
-                  />
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <RequireAuth>
-                        <DashboardLayout />
-                      </RequireAuth>
-                    }
-                  >
-                    <Route path="budget" element={<BudgetPlanner />} />
-                    <Route path="log" element={<DailyLog />} />
-                    <Route path="summary" element={<Summary />} />
-                    <Route path="settings" element={<Settings />} />
+            <PrivacyProvider>
+              <BrowserRouter>
+                <React.Suspense fallback={null}>
+                  <Routes>
+                    <Route path="/" element={<Landing />} />
                     <Route
-                      path="uncategorized-transactions"
-                      element={<UncategorizedTransactions />}
+                      path="/login"
+                      element={
+                        <RedirectIfAuth>
+                          <Login />
+                        </RedirectIfAuth>
+                      }
                     />
-                    <Route path="analytics" element={<Analytics />} />
-                    <Route path="advisor" element={<FinancialAdvisor />} />
-                    <Route path="archive" element={<Archive />} />
-                    <Route index element={<Navigate to="log" replace />} />
-                  </Route>
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </React.Suspense>
-            </BrowserRouter>
+                    <Route
+                      path="/dashboard"
+                      element={
+                        <RequireAuth>
+                          <DashboardLayout />
+                        </RequireAuth>
+                      }
+                    >
+                      <Route path="budget" element={<BudgetPlanner />} />
+                      <Route path="log" element={<DailyLog />} />
+                      <Route path="summary" element={<Summary />} />
+                      <Route path="settings" element={<Settings />} />
+                      <Route
+                        path="uncategorized-transactions"
+                        element={<UncategorizedTransactions />}
+                      />
+                      <Route path="analytics" element={<Analytics />} />
+                      <Route path="advisor" element={<FinancialAdvisor />} />
+                      <Route path="archive" element={<Archive />} />
+                      <Route index element={<Navigate to="log" replace />} />
+                    </Route>
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </React.Suspense>
+              </BrowserRouter>
+            </PrivacyProvider>
           </CurrencyProvider>
         </AuthProvider>
       </ThemeProvider>

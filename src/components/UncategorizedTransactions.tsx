@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { usePrivacy } from "@/contexts/PrivacyContext";
 import {
   doc,
   collection,
@@ -16,6 +18,7 @@ import {
 import { db } from "@/integrations/firebase";
 import { useTranslation } from "react-i18next";
 import { getCategories, addExpense } from "@/utils/periodManager";
+import { PrivacyToggle } from "@/components/ui/privacy-toggle";
 
 interface UncategorizedTransaction {
   id: string;
@@ -40,6 +43,8 @@ interface BudgetCategory {
 export const UncategorizedTransactions = () => {
   const { user } = useAuth();
   const uid = user?.uid;
+  const { currency } = useCurrency();
+  const { showAmounts } = usePrivacy();
   const [transactions, setTransactions] = useState<UncategorizedTransaction[]>(
     []
   );
@@ -200,7 +205,7 @@ export const UncategorizedTransactions = () => {
   const formatAmount = (amount: number, currency: string) => {
     const sign = amount < 0 ? "-" : "";
     const absAmount = Math.abs(amount);
-    return `${sign}${currency}${absAmount.toFixed(2)}`;
+    return `${sign}${currency}${showAmounts ? absAmount.toFixed(2) : '***'}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -277,6 +282,20 @@ export const UncategorizedTransactions = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            🔍 {t("uncategorized.title")}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("uncategorized.description")}
+          </p>
+        </div>
+        <div className="mt-4 md:mt-0 flex justify-center md:justify-end">
+          <PrivacyToggle />
+        </div>
+      </div>
       {latestImport && (
         <div className="flex items-center justify-center mb-2">
           <div className="bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-100 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm">

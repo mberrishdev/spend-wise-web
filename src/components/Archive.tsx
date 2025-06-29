@@ -22,6 +22,7 @@ import {
 import { getArchivedPeriods } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { usePrivacy } from "@/contexts/PrivacyContext";
 import { useTranslation } from "react-i18next";
 import {
   TrendingUp,
@@ -38,6 +39,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
+import { PrivacyToggle } from "@/components/ui/privacy-toggle";
 
 interface Expense {
   id: string;
@@ -69,6 +71,7 @@ export const Archive = () => {
   const { user } = useAuth();
   const uid = user?.uid;
   const { currency } = useCurrency();
+  const { showAmounts } = usePrivacy();
   const [archivedPeriods, setArchivedPeriods] = useState<ArchivedPeriod[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState<ArchivedPeriod | null>(null);
   const [loading, setLoading] = useState(true);
@@ -92,7 +95,7 @@ export const Archive = () => {
   }, [uid, t]);
 
   const formatCurrency = (amount: number) => {
-    return `${currency}${amount.toFixed(2)}`;
+    return `${currency}${showAmounts ? amount.toFixed(2) : '***'}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -257,14 +260,17 @@ export const Archive = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-            📦 {t('archive.title')}
+            📦 {t("archive.title")}
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('archive.description')}
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("archive.description")}
           </p>
+        </div>
+        <div className="mt-4 md:mt-0 flex justify-center md:justify-end">
+          <PrivacyToggle />
         </div>
       </div>
 

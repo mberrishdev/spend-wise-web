@@ -30,6 +30,7 @@ import {
 import { getExpenses, getCategories, getArchivedPeriods } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { usePrivacy } from "@/contexts/PrivacyContext";
 import { useTranslation } from "react-i18next";
 import {
   TrendingUp,
@@ -51,6 +52,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { PrivacyToggle } from "@/components/ui/privacy-toggle";
 
 interface Expense {
   id: string;
@@ -110,12 +112,12 @@ export const Analytics = () => {
   const { user } = useAuth();
   const uid = user?.uid;
   const { currency } = useCurrency();
+  const { showAmounts } = usePrivacy();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
   const [period, setPeriod] = useState<MonthlyPeriod | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAmounts, setShowAmounts] = useState(true);
   const [customPeriodStart, setCustomPeriodStart] = useState<Date | undefined>(undefined);
   const [customPeriodEnd, setCustomPeriodEnd] = useState<Date | undefined>(undefined);
   const [useCustomPeriod, setUseCustomPeriod] = useState(false);
@@ -379,15 +381,7 @@ export const Analytics = () => {
           </div>
 
           {/* Privacy Toggle */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowAmounts(!showAmounts)}
-            className="flex items-center gap-2"
-          >
-            {showAmounts ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            {showAmounts ? t('analytics.hide_amounts') : t('analytics.show_amounts')}
-          </Button>
+          <PrivacyToggle />
         </div>
       </div>
 

@@ -12,7 +12,9 @@ import {
 } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { usePrivacy } from "@/contexts/PrivacyContext";
 import { useTranslation } from "react-i18next";
+import { PrivacyToggle } from "@/components/ui/privacy-toggle";
 
 interface BudgetCategory {
   id: string;
@@ -25,6 +27,7 @@ export const BudgetPlanner = () => {
   const { user } = useAuth();
   const uid = user?.uid;
   const { currency } = useCurrency();
+  const { showAmounts } = usePrivacy();
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryAmount, setNewCategoryAmount] = useState("");
@@ -153,6 +156,20 @@ export const BudgetPlanner = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            💰 {t("budgetPlanner.budget")}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("budgetPlanner.set_goals")}
+          </p>
+        </div>
+        <div className="mt-4 md:mt-0 flex justify-center md:justify-end">
+          <PrivacyToggle />
+        </div>
+      </div>
       <Card className="border-green-200 shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
@@ -355,7 +372,7 @@ export const BudgetPlanner = () => {
               </span>
               <span className="text-xl font-bold text-green-600 dark:text-green-400">
                 {currency}
-                {totalPlanned.toFixed(2)}
+                {showAmounts ? totalPlanned.toFixed(2) : '***'}
               </span>
             </div>
           </div>

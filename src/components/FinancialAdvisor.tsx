@@ -13,6 +13,7 @@ import {
 import { getExpenses, getCategories } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { usePrivacy } from "@/contexts/PrivacyContext";
 import { useTranslation } from "react-i18next";
 import {
   TrendingUp,
@@ -34,7 +35,10 @@ import {
   Shield,
   Brain,
   MessageSquare,
+  Eye,
+  EyeOff,
 } from "lucide-react";
+import { PrivacyToggle } from "@/components/ui/privacy-toggle";
 
 interface Expense {
   id: string;
@@ -68,6 +72,7 @@ export const FinancialAdvisor = () => {
   const { user } = useAuth();
   const uid = user?.uid;
   const { currency } = useCurrency();
+  const { showAmounts } = usePrivacy();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
   const [period, setPeriod] = useState<MonthlyPeriod | null>(null);
@@ -226,7 +231,7 @@ export const FinancialAdvisor = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return `${currency}${amount.toFixed(2)}`;
+    return `${currency}${showAmounts ? amount.toFixed(2) : '***'}`;
   };
 
   if (loading || !period) {
@@ -249,13 +254,18 @@ export const FinancialAdvisor = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-          💡 {t("advisor.title")}
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          {formatPeriodRange(period)} • {t("advisor.subtitle")}
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            💡 {t("advisor.title")}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {formatPeriodRange(period)} • {t("advisor.subtitle")}
+          </p>
+        </div>
+        <div className="mt-4 md:mt-0 flex justify-center md:justify-end">
+          <PrivacyToggle />
+        </div>
       </div>
 
       {/* AI Advisor Coming Soon */}

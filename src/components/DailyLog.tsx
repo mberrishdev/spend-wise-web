@@ -9,8 +9,10 @@ import { toast } from "@/hooks/use-toast";
 import { getExpenses, addExpense, getCategories, deleteExpense, updateExpense } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { usePrivacy } from "@/contexts/PrivacyContext";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { PrivacyToggle } from "@/components/ui/privacy-toggle";
 
 interface Expense {
   id: string;
@@ -30,6 +32,7 @@ export const DailyLog = () => {
   const { user } = useAuth();
   const uid = user?.uid;
   const { currency } = useCurrency();
+  const { showAmounts } = usePrivacy();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -183,6 +186,21 @@ export const DailyLog = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            📝 {t("dailyLog.log")}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("dailyLog.quick_and_easy")}
+          </p>
+        </div>
+        <div className="mt-4 md:mt-0 flex justify-center md:justify-end">
+          <PrivacyToggle />
+        </div>
+      </div>
+
       {/* Quick Add Form */}
       <Card className="border-blue-200 dark:border-gray-800 shadow-sm bg-white dark:bg-gray-900">
         <CardHeader className="pb-4">
@@ -254,7 +272,9 @@ export const DailyLog = () => {
         <CardContent>
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-600 dark:text-gray-300">{t('dailyLog.total_spent_today')}</span>
-            <span className="text-xl font-bold text-blue-600 dark:text-blue-400">{currency}{todaysTotal.toFixed(2)}</span>
+            <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
+              {currency}{showAmounts ? todaysTotal.toFixed(2) : '***'}
+            </span>
           </div>
 
           <div className="space-y-2">
@@ -309,7 +329,9 @@ export const DailyLog = () => {
                         )}
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <div className="font-medium text-gray-800 dark:text-gray-100">{currency}{expense.amount.toFixed(2)}</div>
+                        <div className="font-medium text-gray-800 dark:text-gray-100">
+                          {currency}{showAmounts ? expense.amount.toFixed(2) : '***'}
+                        </div>
                         <div className="flex gap-1 mt-1">
                           <button onClick={() => startEdit(expense)} className="p-1 rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800"><Pencil size={16} /></button>
                           <button onClick={() => handleDeleteExpense(expense.id)} className="p-1 rounded bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800"><Trash2 size={16} /></button>
@@ -385,7 +407,9 @@ export const DailyLog = () => {
                         )}
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <div className="font-medium text-gray-800 dark:text-gray-100">{currency}{expense.amount.toFixed(2)}</div>
+                        <div className="font-medium text-gray-800 dark:text-gray-100">
+                          {currency}{showAmounts ? expense.amount.toFixed(2) : '***'}
+                        </div>
                         <div className="flex gap-1 mt-1">
                           <button onClick={() => startEdit(expense)} className="p-1 rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800"><Pencil size={16} /></button>
                           <button onClick={() => handleDeleteExpense(expense.id)} className="p-1 rounded bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800"><Trash2 size={16} /></button>

@@ -136,8 +136,6 @@
     "failed_to_load_data": "Failed to load analytics data",
     "title": "Financial Analytics",
     "subtitle": "Comprehensive insights into your spending patterns",
-    "hide_amounts": "Hide Amounts",
-    "show_amounts": "Show Amounts",
     "total_spent": "Total Spent",
     "budget_remaining": "Budget Remaining",
     "budget_used": "Budget Used",
@@ -179,7 +177,6 @@
     "overview": "Overview",
     "trends": "Trends",
     "categories": "Categories",
-    "transactions": "Transactions",
     "daily_spending": "Daily Spending",
     "category_breakdown": "Category Breakdown",
     "spending_trends": "Spending Trends",
@@ -250,7 +247,9 @@
       "high": "High",
       "medium": "Medium",
       "low": "Low"
-    }
+    },
+    "hide_amounts": "Hide Amounts",
+    "show_amounts": "Show Amounts"
   },
   "add": "Add",
   "edit": "Edit",
@@ -279,6 +278,8 @@
   "testimonials": "Testimonials",
   "privacy_first": "Privacy-first. Secure by Firebase.",
   "offline": "You are offline. Some features may not work.",
+  "hide_amounts": "Hide Amounts",
+  "show_amounts": "Show Amounts",
   "app": {
     "subtitle": "Your mindful spending companion",
     "logout": "Log out",
@@ -317,5 +318,9 @@
     "no_categories": "No categories found",
     "no_categories_desc": "You need to create budget categories first before you can categorize transactions.",
     "create_categories": "Create Categories"
+  },
+  "privacy": {
+    "hide_amounts": "Hide Amounts",
+    "show_amounts": "Show Amounts"
   }
 }

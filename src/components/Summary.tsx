@@ -11,7 +11,9 @@ import {
 import { getExpenses, getCategories } from "@/utils/periodManager";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { usePrivacy } from "@/contexts/PrivacyContext";
 import { useTranslation } from "react-i18next";
+import { PrivacyToggle } from "@/components/ui/privacy-toggle";
 
 interface Expense {
   id: string;
@@ -41,6 +43,7 @@ export const Summary = () => {
   const { user } = useAuth();
   const uid = user?.uid;
   const { currency } = useCurrency();
+  const { showAmounts } = usePrivacy();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
   const [period, setPeriod] = useState<MonthlyPeriod | null>(null);
@@ -139,6 +142,21 @@ export const Summary = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            📊 {t("summary.summary")}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {formatPeriodRange(period)}
+          </p>
+        </div>
+        <div className="mt-4 md:mt-0 flex justify-center md:justify-end">
+          <PrivacyToggle />
+        </div>
+      </div>
+
       {/* Overall Summary */}
       <Card className="border-purple-200 shadow-sm">
         <CardHeader>
@@ -152,7 +170,7 @@ export const Summary = () => {
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {currency}
-                {totalActual.toFixed(2)}
+                {showAmounts ? totalActual.toFixed(2) : '***'}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300">{t('summary.spent')}</div>
             </div>
@@ -163,7 +181,7 @@ export const Summary = () => {
                 }`}
               >
                 {currency}
-                {Math.abs(totalRemaining).toFixed(2)}
+                {showAmounts ? Math.abs(totalRemaining).toFixed(2) : '***'}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300">
                 {totalRemaining >= 0 ? t('summary.remaining') : t('summary.over_budget')}
@@ -226,13 +244,11 @@ export const Summary = () => {
                     </span>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium">
-                      {currency}
-                      {summary.actual.toFixed(2)}
+                    <div className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                      {currency}{showAmounts ? summary.actual.toFixed(2) : '***'}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {t('summary.of')} {currency}
-                      {summary.planned.toFixed(2)}
+                    <div className="text-sm text-gray-500">
+                      {t('of')} {currency}{showAmounts ? summary.planned.toFixed(2) : '***'}
                     </div>
                   </div>
                 </div>
@@ -253,9 +269,9 @@ export const Summary = () => {
                     }`}
                   >
                     {summary.remaining >= 0
-                      ? currency + summary.remaining.toFixed(2) + ` ${t('summary.left')}`
+                      ? currency + (showAmounts ? summary.remaining.toFixed(2) : '***') + ` ${t('summary.left')}`
                       : currency +
-                        Math.abs(summary.remaining).toFixed(2) +
+                        (showAmounts ? Math.abs(summary.remaining).toFixed(2) : '***') +
                         ` ${t('summary.over')}`}
                   </span>
                 </div>
