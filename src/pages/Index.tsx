@@ -121,7 +121,7 @@ const DashboardLayout = () => {
       label: t("navigation.add"),
     },
     {
-      to: "/dashboard/analytics", 
+      to: "/dashboard/analytics",
       icon: BarChart3,
       label: t("navigation.analytics"),
     },
@@ -262,13 +262,6 @@ const DashboardLayout = () => {
                 >
                   <Menu className="w-5 h-5" />
                 </Button>
-                <div className="flex items-center gap-2 min-w-0">
-                  <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 truncate">
-                    {navigationItems.find(
-                      (item) => item.path === location.pathname
-                    )?.label || "Dashboard"}
-                  </h1>
-                </div>
               </div>
               {/* Quick Actions */}
               <div className="flex items-center gap-2">
@@ -303,7 +296,7 @@ const DashboardLayout = () => {
         <div className="flex justify-around py-2">
           {mobileNavItems.map((item, index) => {
             const IconComponent = item.icon;
-            
+
             if (item.to) {
               return (
                 <NavLink

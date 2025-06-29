@@ -95,7 +95,7 @@ const App = () => (
         </AuthProvider>
       </ThemeProvider>
     </TooltipProvider>
-    <VercelAnalytics />
+    {import.meta.env.DEV ? null : <VercelAnalytics />}
   </QueryClientProvider>
 );
 

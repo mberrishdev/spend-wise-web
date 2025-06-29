@@ -262,6 +262,7 @@
   "good_evening": "Good evening",
   "good_night": "Good night",
   "friend": "friend",
+  "loading": "Loading...",
   "uncategorized": {
     "title": "Uncategorized Transactions",
     "need_categorization": "transaction(s) need categorization",
