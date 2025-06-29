@@ -521,6 +521,31 @@ export const Analytics = () => {
                     }} />
                   </PieChart>
                 </ResponsiveContainer>
+                
+                {/* Legend */}
+                <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {categorySpendingData.map((entry, index) => {
+                    const total = categorySpendingData.reduce((sum, item) => sum + item.value, 0);
+                    const percentage = total > 0 ? (entry.value / total) * 100 : 0;
+                    
+                    return (
+                      <div key={index} className="flex items-center space-x-2">
+                        <div 
+                          className="w-4 h-4 rounded-full flex-shrink-0" 
+                          style={{ backgroundColor: entry.color }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                            {entry.name}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {percentage.toFixed(1)}%
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -618,6 +643,7 @@ export const Analytics = () => {
                       </div>
                       <Progress
                         value={summary.percentage}
+                        color={summary.color}
                         className="h-2"
                         style={{
                           '--progress-background': summary.color,
@@ -688,6 +714,7 @@ export const Analytics = () => {
                         
                         <Progress
                           value={summary.percentage}
+                          color={summary.color}
                           className="h-2"
                           style={{
                             '--progress-background': summary.color,
