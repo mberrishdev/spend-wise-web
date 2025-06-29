@@ -1,5 +1,11 @@
 {
   "welcome": "Welcome to SpendWise",
+  "navigation": {
+    "add": "Add",
+    "analytics": "Analytics", 
+    "budget": "Budget",
+    "more": "More"
+  },
   "budgetPlanner": {
     "budget": "Budget",
     "failed_to_load_categories": "Failed to load categories",

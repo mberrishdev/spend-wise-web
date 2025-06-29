@@ -113,6 +113,30 @@ const DashboardLayout = () => {
     },
   ];
 
+  // Mobile navigation items
+  const mobileNavItems = [
+    {
+      to: "/dashboard/log",
+      icon: PlusCircle,
+      label: t("navigation.add"),
+    },
+    {
+      to: "/dashboard/analytics", 
+      icon: BarChart3,
+      label: t("navigation.analytics"),
+    },
+    {
+      to: "/dashboard/budget",
+      icon: Calendar,
+      label: t("navigation.budget"),
+    },
+    {
+      action: () => setSidebarOpen(true),
+      icon: Menu,
+      label: t("navigation.more"),
+    },
+  ];
+
   return (
     <div className="flex min-h-screen h-auto bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
       {/* Mobile Sidebar Overlay */}
@@ -277,55 +301,39 @@ const DashboardLayout = () => {
       {/* Mobile Bottom Navigation - Only for essential actions */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/95 backdrop-blur-sm border-t border-green-100 dark:border-gray-800 lg:hidden">
         <div className="flex justify-around py-2">
-          <NavLink
-            to="/dashboard/log"
-            className={({ isActive }) =>
-              `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
-                isActive
-                  ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
-                  : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
-              }`
+          {mobileNavItems.map((item, index) => {
+            const IconComponent = item.icon;
+            
+            if (item.to) {
+              return (
+                <NavLink
+                  key={index}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
+                        : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
+                    }`
+                  }
+                >
+                  <IconComponent size={20} />
+                  <span className="text-xs mt-1 font-medium">{item.label}</span>
+                </NavLink>
+              );
+            } else {
+              return (
+                <button
+                  key={index}
+                  onClick={item.action}
+                  className="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
+                >
+                  <IconComponent size={20} />
+                  <span className="text-xs mt-1 font-medium">{item.label}</span>
+                </button>
+              );
             }
-          >
-            <PlusCircle size={20} />
-            <span className="text-xs mt-1 font-medium">Add</span>
-          </NavLink>
-
-          <NavLink
-            to="/dashboard/analytics"
-            className={({ isActive }) =>
-              `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
-                isActive
-                  ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
-                  : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
-              }`
-            }
-          >
-            <BarChart3 size={20} />
-            <span className="text-xs mt-1 font-medium">Analytics</span>
-          </NavLink>
-
-          <NavLink
-            to="/dashboard/budget"
-            className={({ isActive }) =>
-              `flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
-                isActive
-                  ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
-                  : "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
-              }`
-            }
-          >
-            <Calendar size={20} />
-            <span className="text-xs mt-1 font-medium">Budget</span>
-          </NavLink>
-
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
-          >
-            <Menu size={20} />
-            <span className="text-xs mt-1 font-medium">More</span>
-          </button>
+          })}
         </div>
       </div>
 

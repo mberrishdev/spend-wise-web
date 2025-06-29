@@ -1,5 +1,11 @@
 {
   "welcome": "მოგესალმებით SpendWise-ში",
+  "navigation": {
+    "add": "დამატება",
+    "analytics": "ანალიტიკა",
+    "budget": "ბიუჯეტი", 
+    "more": "მეტი"
+  },
   "budgetPlanner": {
     "budget": "ბიუჯეტი",
     "failed_to_load_categories": "ვერ მოხერხდა კატეგორიების ჩატვირთვა",
