@@ -53,8 +53,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <ThemeProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <ThemeProvider>
           <CurrencyProvider>
             <PrivacyProvider>
               <BrowserRouter>
@@ -97,8 +97,8 @@ const App = () => (
               </BrowserRouter>
             </PrivacyProvider>
           </CurrencyProvider>
-        </AuthProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </TooltipProvider>
     {import.meta.env.DEV ? null : <VercelAnalytics />}
   </QueryClientProvider>

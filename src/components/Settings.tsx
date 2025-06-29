@@ -18,7 +18,6 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/integrations/firebase";
 import { useTranslation } from "react-i18next";
 import { Switch } from "@/components/ui/switch";
-import { useTheme } from "@/contexts/ThemeContext";
 
 const CURRENCIES = [
   { code: "GEL", symbol: "₾" },
@@ -56,7 +55,6 @@ export const Settings = () => {
   const initialPeriod = useRef({ startDay: 25, endDay: 24 });
   const initialCurrency = useRef("₾");
   const initialLang = useRef(i18n.language);
-  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     if (!uid) return;
@@ -80,9 +78,6 @@ export const Settings = () => {
           setApiKey(data.apiKey || "");
           if (data.language && data.language !== i18n.language) {
             i18n.changeLanguage(data.language);
-          }
-          if (data.theme && data.theme !== theme) {
-            setTheme(data.theme);
           }
         }
         initialLang.current = i18n.language;
@@ -158,19 +153,26 @@ export const Settings = () => {
   };
 
   const saveLanguage = async (lang: string) => {
-    i18n.changeLanguage(lang);
-    initialLang.current = lang;
-    toast({ title: t("settings.language_note") });
-    if (uid) {
-      await setDoc(doc(db, "users", uid, "profile", "main"), { language: lang }, { merge: true });
+    if (!uid) return;
+    setSaving(true);
+    try {
+      await setDoc(
+        doc(db, "users", uid),
+        { language: lang },
+        { merge: true }
+      );
+      i18n.changeLanguage(lang);
+      toast({
+        title: t("settings.language_saved"),
+        description: t("settings.language_saved_desc"),
+      });
+    } catch (error) {
+      toast({
+        title: t("settings.failed_to_save_language"),
+        variant: "destructive",
+      });
     }
-  };
-
-  const handleThemeChange = async (newTheme: typeof theme) => {
-    setTheme(newTheme);
-    if (uid) {
-      await setDoc(doc(db, "users", uid, "profile", "main"), { theme: newTheme }, { merge: true });
-    }
+    setSaving(false);
   };
 
   const generateNewApiKey = async () => {
@@ -569,60 +571,6 @@ export const Settings = () => {
           <p className="text-xs text-gray-600 dark:text-gray-400">
             {t("settings.language_note")}
           </p>
-        </CardContent>
-      </Card>
-
-      {/* Theme Section */}
-      <Card className="border-gray-200 shadow-sm mb-6 bg-white dark:bg-gray-900">
-        <CardHeader className="pb-2 px-4 pt-4">
-          <CardTitle className="text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
-            🌓 {t("settings.theme")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 px-4 pb-4">
-          <div className="flex items-center gap-4">
-            <Label
-              htmlFor="theme-switch"
-              className="flex-1 text-gray-700 dark:text-gray-100"
-            >
-              {t("settings.theme")}
-            </Label>
-            <div className="flex items-center gap-2">
-              <button
-                className={`px-2 py-1 rounded ${
-                  theme === "system"
-                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                    : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200"
-                }`}
-                onClick={() => handleThemeChange("system")}
-                type="button"
-              >
-                {t("settings.theme_system")}
-              </button>
-              <button
-                className={`px-2 py-1 rounded ${
-                  theme === "light"
-                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                    : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200"
-                }`}
-                onClick={() => handleThemeChange("light")}
-                type="button"
-              >
-                {t("settings.theme_light")}
-              </button>
-              <button
-                className={`px-2 py-1 rounded ${
-                  theme === "dark"
-                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                    : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200"
-                }`}
-                onClick={() => handleThemeChange("dark")}
-                type="button"
-              >
-                {t("settings.theme_dark")}
-              </button>
-            </div>
-          </div>
         </CardContent>
       </Card>
 

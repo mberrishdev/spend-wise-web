@@ -19,6 +19,7 @@ import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { User } from "firebase/auth";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const getGreeting = (
   t: ReturnType<typeof useTranslation>["t"],
@@ -287,6 +288,7 @@ const DashboardLayout = () => {
                     </Button>
                   );
                 })}
+                <ThemeToggle />
               </div>
             </div>
           </div>
