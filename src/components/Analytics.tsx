@@ -320,6 +320,19 @@ export const Analytics = () => {
     return "🚨";
   };
 
+  // Calculate period range for metrics
+  const today = new Date();
+  const periodRange = selectedArchivedPeriod
+    ? { start: new Date(selectedArchivedPeriod.periodStart), end: new Date(selectedArchivedPeriod.periodEnd) }
+    : period
+      ? getCurrentPeriodRange(period)
+      : null;
+
+  const daysElapsed = periodRange ? Math.max(1, Math.ceil(((Math.min(today.getTime(), periodRange.end.getTime()) - periodRange.start.getTime()) / (1000 * 60 * 60 * 24))) + 1) : 1;
+  const daysLeft = periodRange ? Math.max(0, Math.ceil((periodRange.end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))) : 0;
+  const avgDailySpend = totals.actual / daysElapsed;
+  const safeToSpendPerDay = daysLeft > 0 ? totals.remaining / daysLeft : 0;
+
   if (loading || !period) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -419,33 +432,49 @@ export const Analytics = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-purple-200 dark:border-purple-800">
+        <Card className="border-orange-200 dark:border-orange-800">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.budget_used')}</p>
-                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {totals.percentageUsed.toFixed(1)}%
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.avg_daily_spend', 'Avg Daily Spend')}</p>
+                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  {formatCurrency(avgDailySpend)}
                 </p>
               </div>
-              <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                <BarChart3 className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
+                <CalendarIcon className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-orange-200 dark:border-orange-800">
+        <Card className="border-blue-200 dark:border-blue-800">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.transactions')}</p>
-                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                  {currentPeriodExpenses.length}
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.days_left', 'Days Left')}</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {daysLeft}
                 </p>
               </div>
-              <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
-                <Activity className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+              <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-green-200 dark:border-green-800">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.safe_to_spend', 'Safe to Spend/Day')}</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {formatCurrency(safeToSpendPerDay)}
+                </p>
+              </div>
+              <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
             </div>
           </CardContent>
