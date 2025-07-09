@@ -99,6 +99,11 @@ export const UncategorizedTransactions = () => {
         (tx) => tx.status !== "deleted"
       );
 
+      // Sort by date (newest first) after filtering
+      filteredTransactions.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+
       setTransactions(filteredTransactions);
 
       //setTransactions(uncategorizedTransactions);

@@ -178,11 +178,13 @@ export const DailyLog = () => {
     );
   }
 
-  const todaysExpenses = expenses.filter(expense => expense.date === date);
+  const todaysExpenses = expenses.filter(expense => expense.date === date)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const todaysTotal = todaysExpenses.reduce((sum, expense) => sum + expense.amount, 0);
 
-  // Filter for all expenses except today's
-  const otherExpenses = expenses.filter(expense => expense.date !== date);
+  // Filter for all expenses except today's and sort by date (newest first)
+  const otherExpenses = expenses.filter(expense => expense.date !== date)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <div className="space-y-6">
