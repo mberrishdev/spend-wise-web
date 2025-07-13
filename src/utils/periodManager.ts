@@ -38,7 +38,18 @@ interface ArchivedPeriod {
   archivedAt: string;
 }
 
-// Firestore paths: users/{uid}/dailyLogs, users/{uid}/archive, users/{uid}/categories
+interface BorrowedMoney {
+  id: string;
+  date: string;
+  amount: number;
+  description: string;
+  friendName: string;
+  returnDate?: string;
+  isReturned: boolean;
+  returnedDate?: string;
+}
+
+// Firestore paths: users/{uid}/dailyLogs, users/{uid}/archive, users/{uid}/categories, users/{uid}/borrowedMoney
 
 export async function getExpenses(uid: string): Promise<Expense[]> {
   const col = collection(db, "users", uid, "dailyLogs");
@@ -145,5 +156,37 @@ export async function updateExpense(
   data: Partial<Expense>
 ): Promise<void> {
   const ref = doc(db, "users", uid, "dailyLogs", expenseId);
+  await updateDoc(ref, data);
+}
+
+// Borrowed Money Functions
+export async function getBorrowedMoney(uid: string): Promise<BorrowedMoney[]> {
+  const col = collection(db, "users", uid, "borrowedMoney");
+  const snap = await getDocs(col);
+  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as BorrowedMoney));
+}
+
+export async function addBorrowedMoney(
+  uid: string,
+  borrowedMoney: Omit<BorrowedMoney, "id">
+): Promise<void> {
+  const col = collection(db, "users", uid, "borrowedMoney");
+  await addDoc(col, borrowedMoney);
+}
+
+export async function deleteBorrowedMoney(
+  uid: string,
+  borrowedMoneyId: string
+): Promise<void> {
+  const ref = doc(db, "users", uid, "borrowedMoney", borrowedMoneyId);
+  await deleteDoc(ref);
+}
+
+export async function updateBorrowedMoney(
+  uid: string,
+  borrowedMoneyId: string,
+  data: Partial<BorrowedMoney>
+): Promise<void> {
+  const ref = doc(db, "users", uid, "borrowedMoney", borrowedMoneyId);
   await updateDoc(ref, data);
 }

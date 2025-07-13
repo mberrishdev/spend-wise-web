@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   Archive,
+  DollarSign,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -91,6 +92,12 @@ const DashboardLayout = () => {
       label: t("archive.title"),
       icon: Archive,
       path: "/dashboard/archive",
+    },
+    {
+      id: "borrowed-money",
+      label: t("borrowedMoney.title"),
+      icon: DollarSign,
+      path: "/dashboard/borrowed-money",
     },
     {
       id: "uncategorized",
