@@ -269,7 +269,7 @@
     "description": "აღწერა",
     "description_placeholder": "რისთვის იყო? (არასავალდებულო)",
     "add": "დამატება",
-    "active_borrowed": "აქტიური სესხები",
+    "active_borrowed": "აქტიური გასესხებული ფული",
     "total_returned": "სულ დაბრუნებული",
     "returned": "დაბრუნებული",
     "mark_returned": "მონიშვნა როგორც დაბრუნებული",
