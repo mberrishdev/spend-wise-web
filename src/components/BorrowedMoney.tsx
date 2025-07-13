@@ -333,7 +333,7 @@ export const BorrowedMoney = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                        {borrowed.friendName}
+                        {showAmounts ? borrowed.friendName : '***'}
                       </h3>
                       <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                         {showAmounts ? `${currency} ${borrowed.amount.toFixed(2)}` : "***"}
@@ -410,7 +410,7 @@ export const BorrowedMoney = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                        {borrowed.friendName}
+                        {showAmounts ? borrowed.friendName : '***'}
                       </h3>
                       <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                         {showAmounts ? `${currency} ${borrowed.amount.toFixed(2)}` : "***"}
