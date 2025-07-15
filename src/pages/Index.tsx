@@ -13,6 +13,7 @@ import {
   X,
   Archive,
   DollarSign,
+  PiggyBank,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -104,6 +105,12 @@ const DashboardLayout = () => {
       label: t("uncategorized.title"),
       icon: FileText,
       path: "/dashboard/uncategorized-transactions",
+    },
+    {
+      id: "savings",
+      label: t("savings.title", "Savings Goals"),
+      icon: PiggyBank,
+      path: "/dashboard/savings",
     },
     {
       id: "settings",

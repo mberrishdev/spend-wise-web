@@ -49,7 +49,33 @@ interface BorrowedMoney {
   returnedDate?: string;
 }
 
-// Firestore paths: users/{uid}/dailyLogs, users/{uid}/archive, users/{uid}/categories, users/{uid}/borrowedMoney
+export interface SavingsTransaction {
+  id: string;
+  date: string;
+  amount: number; // positive for add, negative for withdraw
+  note?: string;
+}
+
+export interface MonthlyBalance {
+  id: string;
+  date: string;
+  amount: number;
+}
+
+export interface SavingsGoal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  fromDate: string;
+  toDate: string;
+  category?: string;
+  notes?: string;
+  completed: boolean;
+  trackingDay: number; // 1-31
+}
+
+// Firestore paths: users/{uid}/dailyLogs, users/{uid}/archive, users/{uid}/categories, users/{uid}/borrowedMoney, users/{uid}/savingsGoals, users/{uid}/savingsGoals/{goalId}/transactions
 
 export async function getExpenses(uid: string): Promise<Expense[]> {
   const col = collection(db, "users", uid, "dailyLogs");
@@ -189,4 +215,53 @@ export async function updateBorrowedMoney(
 ): Promise<void> {
   const ref = doc(db, "users", uid, "borrowedMoney", borrowedMoneyId);
   await updateDoc(ref, data);
+}
+
+export async function getSavingsGoals(uid: string): Promise<SavingsGoal[]> {
+  const col = collection(db, "users", uid, "savingsGoals");
+  const snap = await getDocs(col);
+  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SavingsGoal));
+}
+
+export async function addSavingsGoal(uid: string, goal: Omit<SavingsGoal, "id">): Promise<string> {
+  const col = collection(db, "users", uid, "savingsGoals");
+  const docRef = await addDoc(col, goal);
+  return docRef.id;
+}
+
+export async function updateSavingsGoal(uid: string, goalId: string, data: Partial<SavingsGoal>): Promise<void> {
+  const ref = doc(db, "users", uid, "savingsGoals", goalId);
+  await updateDoc(ref, data);
+}
+
+export async function deleteSavingsGoal(uid: string, goalId: string): Promise<void> {
+  const ref = doc(db, "users", uid, "savingsGoals", goalId);
+  await deleteDoc(ref);
+}
+
+export async function getSavingsTransactions(uid: string, goalId: string): Promise<SavingsTransaction[]> {
+  const col = collection(db, "users", uid, "savingsGoals", goalId, "transactions");
+  const snap = await getDocs(col);
+  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as SavingsTransaction));
+}
+
+export async function addSavingsTransaction(uid: string, goalId: string, tx: Omit<SavingsTransaction, "id">): Promise<void> {
+  const col = collection(db, "users", uid, "savingsGoals", goalId, "transactions");
+  await addDoc(col, tx);
+}
+
+export async function deleteSavingsTransaction(uid: string, goalId: string, txId: string): Promise<void> {
+  const ref = doc(db, "users", uid, "savingsGoals", goalId, "transactions", txId);
+  await deleteDoc(ref);
+}
+
+export async function getMonthlyBalances(uid: string, goalId: string): Promise<MonthlyBalance[]> {
+  const col = collection(db, "users", uid, "savingsGoals", goalId, "balances");
+  const snap = await getDocs(col);
+  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as MonthlyBalance));
+}
+
+export async function addMonthlyBalance(uid: string, goalId: string, balance: Omit<MonthlyBalance, "id">): Promise<void> {
+  const col = collection(db, "users", uid, "savingsGoals", goalId, "balances");
+  await addDoc(col, balance);
 }

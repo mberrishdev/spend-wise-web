@@ -355,5 +355,36 @@
   "privacy": {
     "hide_amounts": "Hide Amounts",
     "show_amounts": "Show Amounts"
-  }
+  },
+  "savings": {
+    "title": "Savings Goals",
+    "description": "Track and achieve your savings goals",
+    "add_goal": "Add Goal",
+    "no_goals": "No savings goals yet",
+    "start_tracking": "Start tracking your savings goals",
+    "target": "Target",
+    "saved": "Saved",
+    "progress": "Progress",
+    "fill_required": "Please fill all required fields",
+    "failed_to_add": "Failed to add savings goal",
+    "goal_name": "Goal Name",
+    "from_date": "From Date",
+    "to_date": "To Date",
+    "category": "Category",
+    "notes": "Notes",
+    "tracking_day": "Tracking Day (1-31)",
+    "tracking_day_hint": "Which day of the month do you want to log your balance?",
+    "tracking_day_invalid": "Tracking day must be between 1 and 31"
+  },
+  "add_money": "Add Money",
+  "amount": "Amount",
+  "date": "Date",
+  "date_placeholder": "Select date",
+  "note": "Note",
+  "failed_to_add_money": "Failed to add money",
+  "log_balance": "Log Balance",
+  "balance_history": "Balance History",
+  "failed_to_log_balance": "Failed to log balance",
+  "confirm_delete_balance": "Delete this balance entry?",
+  "view_details": "View Details"
 }

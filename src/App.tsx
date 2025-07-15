@@ -27,6 +27,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { FinancialAdvisor } from "@/components/FinancialAdvisor";
 import { Summary } from "@/components/Summary";
 import { BorrowedMoney } from "@/components/BorrowedMoney";
+import { Savings } from "@/components/Savings";
 
 const queryClient = new QueryClient();
 
@@ -90,6 +91,7 @@ const App = () => (
                       <Route path="advisor" element={<FinancialAdvisor />} />
                       <Route path="archive" element={<Archive />} />
                       <Route path="borrowed-money" element={<BorrowedMoney />} />
+                      <Route path="savings" element={<Savings />} />
                       <Route index element={<Navigate to="log" replace />} />
                     </Route>
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
